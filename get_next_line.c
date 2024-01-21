@@ -6,18 +6,18 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/24 13:49:30 by mbest             #+#    #+#             */
-/*   Updated: 2023/12/06 18:35:02 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/21 19:55:08 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	ft_extract_line(t_list **stash, char **line, int fd)
+void	ft_extract_line(t_list_gnl **stash, char **line, int fd)
 {
 	int		i;
 	int		j;
 	int		len;
-	t_list	*ptr;
+	t_list_gnl	*ptr;
 
 	i = 0;
 	len = ft_len_stash(stash, fd);
@@ -35,13 +35,13 @@ void	ft_extract_line(t_list **stash, char **line, int fd)
 	(*line)[i] = '\0';
 }
 
-void	clean_and_store_remaining(t_list **stash, int fd, int index)
+void	clean_and_store_remaining(t_list_gnl **stash, int fd, int index)
 {
-	t_list	*last;
-	t_list	*clean_node;
+	t_list_gnl	*last;
+	t_list_gnl	*clean_node;
 	int		j;
 
-	clean_node = (t_list *)malloc(sizeof(t_list));
+	clean_node = (t_list_gnl *)malloc(sizeof(t_list_gnl));
 	if (clean_node == NULL)
 		return ;
 	clean_node->next = NULL;
@@ -64,10 +64,10 @@ void	clean_and_store_remaining(t_list **stash, int fd, int index)
 	(free_stash(stash, fd), addback_stash(stash, clean_node));
 }
 
-int	found_newline(t_list *stash)
+int	found_newline(t_list_gnl *stash)
 {
 	int		i;
-	t_list	*current;
+	t_list_gnl	*current;
 
 	if (stash == NULL)
 		return (0);
@@ -83,10 +83,10 @@ int	found_newline(t_list *stash)
 	return (0);
 }
 
-void	read_and_stash(int fd, t_list **stash)
+void	read_and_stash(int fd, t_list_gnl **stash)
 {
 	int		bytes_read;
-	t_list	*new;
+	t_list_gnl	*new;
 	char	*buffer;
 
 	bytes_read = 1;
@@ -112,7 +112,7 @@ char	*get_next_line(int fd)
 	int				index;
 	int				len;
 	char			*line;
-	static t_list	*stash;
+	static t_list_gnl	*stash;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, &line, 0) < 0)
 		return (free_stash(&stash, fd), NULL);

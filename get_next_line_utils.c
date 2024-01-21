@@ -6,17 +6,17 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 17:04:25 by mbest             #+#    #+#             */
-/*   Updated: 2023/12/04 16:07:24 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/21 18:30:42 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_len_stash(t_list **stash, int fd)
+int	ft_len_stash(t_list_gnl **stash, int fd)
 {
 	int		i;
 	int		count;
-	t_list	*current;
+	t_list_gnl	*current;
 
 	count = 0;
 	current = *stash;
@@ -38,9 +38,9 @@ int	ft_len_stash(t_list **stash, int fd)
 	return (count);
 }
 
-void	addback_stash(t_list **stash, t_list *newnode)
+void	addback_stash(t_list_gnl **stash, t_list_gnl *newnode)
 {
-	t_list	*last;
+	t_list_gnl	*last;
 
 	if (newnode == NULL)
 		return ;
@@ -55,13 +55,13 @@ void	addback_stash(t_list **stash, t_list *newnode)
 	}
 }
 
-t_list	*create_elem(int fd, char *buffer, int bytes_read)
+t_list_gnl	*create_elem(int fd, char *buffer, int bytes_read)
 {
 	int		i;
-	t_list	*new;
+	t_list_gnl	*new;
 
 	i = 0;
-	new = (t_list *)malloc(sizeof(t_list));
+	new = (t_list_gnl *)malloc(sizeof(t_list_gnl));
 	if (new == NULL)
 		return (NULL);
 	new->content = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
@@ -81,7 +81,7 @@ t_list	*create_elem(int fd, char *buffer, int bytes_read)
 	return (new);
 }
 
-void	remove_node(t_list **stash, t_list **current, t_list *previous)
+void	remove_node(t_list_gnl **stash, t_list_gnl **current, t_list_gnl *previous)
 {
 	if (previous)
 	{
@@ -99,10 +99,10 @@ void	remove_node(t_list **stash, t_list **current, t_list *previous)
 	}
 }
 
-void	free_stash(t_list **stash, int fd)
+void	free_stash(t_list_gnl **stash, int fd)
 {
-	t_list	*current;
-	t_list	*previous;
+	t_list_gnl	*current;
+	t_list_gnl	*previous;
 
 	current = *stash;
 	previous = NULL;
