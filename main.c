@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 16:39:41 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/21 19:50:03 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/22 19:29:18 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,24 +41,18 @@ char	**fill_map(int count)
 
 	map = (char **)malloc(count * sizeof(char *));
 	if (map == NULL)
-	{
-		perror("Failed to allocate memory for the map\n");
-		return (NULL);
-	}
+		return (perror("Failed to allocate memory for the map\n"), NULL);
 	fd = open("maps/map_1.ber", O_RDONLY);
 	if (fd < 0)
 		return (perror("Error opening the file\n"), NULL);
 	i = 0;
 	while ((line = get_next_line(fd)) != NULL)
 	{
-        len = ft_strlen(line);
+        len = ft_strlen_nl(line);
 		map[i] = (char *)malloc(sizeof(char) * (len + 1));
         if (map[i] == NULL)
-        {
-			perror("Failed to allocated memory for line\n");
-			return (NULL);
-        }
-        ft_strlcpy(map[i], line, len);
+			return (perror("Failed to allocated memory for line\n"), NULL);
+        ft_strlcpy(map[i], line, len + 1);
         free(line);
         i++;
 	}
@@ -77,17 +71,38 @@ char	**read_map(int *rows)
 	count = 0;
 	ft_count_map_lines(&count);
 	ft_printf("Count = %d\n", count);
+	*rows = count;
     
 	// SECOND PASS - Lire dans la map
 	map = fill_map(count);
 	if (map == NULL)
 		return (NULL);
-
-    
-	*rows = count;
+	
+	// BASIC CHECK - Legal caracters (0 1 C E P) - At least one C and only one E & P - Rectangular - Walls
+	printf("Number of rows = %d\n", count);
+    // check_caracters(map, *rows);
+	if (!(check_caracters(map, count)))
+	{
+		ft_printf("Maps must only contain these 5 caracters : [0 - 1 - C - P - E]\n");
+		return (NULL);
+	}
+	// Minimum requis
+	if (!(get_map_info(map, count)))
+		return (NULL);
+	// Is rectangular ??
+	if (!(is_rectangular(map, count)))
+		return (NULL);
+	// Walls surrounded ??
+	if (!(surrounded_by_walls(map, count)))
+		return (NULL);
+	// Is map valid ? Flood Fill
+	if (!(is_map_valid(map, count)))
+		return (NULL);
 	return (map);
 }
-
+/* We read the map once to get the number of lines 
+	We malloc and store the map with the fill_map function 
+	*/
 int	main(void)
 {
 	int rows;
@@ -95,7 +110,10 @@ int	main(void)
 
 	rows = 0;
 	map = read_map(&rows);
-    
+    if (map == NULL)
+		return (1);
+	printf("Printing out the map\n");
+	printf("Rows = %d\n", rows);
     for (int i = 0; i < rows; i++)
     {
         ft_printf("%s\n", map[i]);
