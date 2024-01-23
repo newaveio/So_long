@@ -1,4 +1,10 @@
-SO_LONG = get_next_line.c get_next_line_utils.c
+SO_LONG = main.c \
+			get_next_line.c \
+			get_next_line_utils.c \
+			check_map.c \
+			utils.c \
+			utils_2.c \
+			game.c
 
 LIBFT = libft/libft.a
 
@@ -10,23 +16,38 @@ OBJS = $(addprefix $(OBJDIR),${SRC:.c=.o})
 
 OBJDIR = objs/
 
-NAME = solong.a
+NAME = solong
 
 CC = cc
 
 CFLAGS = -Wall -Wextra -Werror
 
+UNAME = $(shell uname)
+
+ifeq ($(UNAME), Linux)
+	INCLUDES = -I/usr/include -Imlx
+endif
+
+MLX_DIR = ./mlx
+
+MLX_LIB = $(MLX_DIR)/libmlx_$(UNAME).a
+
+ifeq ($(UNAME), Linux)
+	MLX_FLAGS = -Lmlx -lmlx -L/usr/lib/X11 -lXext -lX11
+endif
+
+all: $(MLX_LIB) $(NAME)
+
 $(OBJDIR)%.o : %.c
 	mkdir -p $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-all: $(NAME)
+	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES)
 
 $(NAME): $(OBJS)
 	make -C $(LIBFTDIR)
-	cp $(LIBFT) .
-	mv libft.a $(NAME)
-	ar -rcs $(NAME) $(OBJS)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -L$(LIBFTDIR) -lft $(MLX_FLAGS)
+
+$(MLX_LIB):
+	@make -C $(MLX_DIR)
 
 clean:
 	rm -f $(OBJS)

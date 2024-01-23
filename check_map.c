@@ -6,13 +6,11 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 16:09:08 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/22 20:26:26 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/23 14:45:31 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include "libft/headers/ft_printf.h"
-#include "libft/headers/libft.h"
 
 int	surrounded_by_walls(char **map, int rows)
 {
@@ -83,7 +81,7 @@ int	check_caracters(char **map, int rows)
 	return (1);
 }
 
-int	check_map_info(t_map map_info)
+int	check_map_info(t_map_ch map_info)
 {
 	if (map_info.nb_c < 1)
 		return (perror("No collectibles\n"), 0);
@@ -94,7 +92,7 @@ int	check_map_info(t_map map_info)
 	return (1);
 }
 
-void	get_c_e_p(char **map, int rows, t_map *map_info)
+void	get_c_e_p(char **map, int rows, t_map_ch *map_info)
 {
 	int	i;
 	int	j;
@@ -123,9 +121,9 @@ void	get_c_e_p(char **map, int rows, t_map *map_info)
 
 int	get_map_info(char **map, int rows)
 {
-	int		i;
-	int		j;
-	t_map	map_info;
+	int			i;
+	int			j;
+	t_map_ch	map_info;
 
 	i = 0;
 	j = 0;
@@ -135,51 +133,108 @@ int	get_map_info(char **map, int rows)
 	return (1);
 }
 
-void    fill_struct_player_map(char **map, t_play *play_map_info, int rows)
+void	fill_struct_player_map(char **map, t_play *play_map_info, int rows)
 {
-    int i;
-    int j;
+	int	i;
+	int	j;
 
-    i = 0;
-    j = 0;
-    play_map_info->nb_c = 0;
-    while (i < rows)
-    {
-        j = 0;
-        while (map[i][j])
-        {
-            if (map[i][j] == 'C')
-                play_map_info->nb_c++;
-            if (map[i][j] == 'P')
-            {
-                play_map_info->player_x = i;
-                play_map_info->player_y = j;
-            }
-            j++;
-        }
-        i++;
-    }
-    play_map_info->rows = rows;
-    play_map_info->cols = ft_strlen_nl(map[0]);
+	i = -1;
+	j = 0;
+	play_map_info->nb_c = 0;
+	while (++i < rows)
+	{
+		j = 0;
+		while (map[i][j])
+		{
+			if (map[i][j] == 'C')
+				play_map_info->nb_c++;
+			if (map[i][j] == 'P')
+			{
+				play_map_info->player_x = i;
+				play_map_info->player_y = j;
+			}
+			j++;
+		}
+	}
+	play_map_info->collected = 0;
+	play_map_info->exits = 0;
+	play_map_info->rows = rows - 1;
+	play_map_info->cols = ft_strlen_nl(map[0]) - 1;
 }
 
-int flood_fill(char **map, t_play *play_map_info)
+int	flood_fill(char **map, int x, int y, t_play *play_map_info)
 {
-
+	if (x < 0 || x >= play_map_info->rows || y < 0 || y >= play_map_info->cols
+		|| map[x][y] == '1')
+		return (0);
+	if (map[x][y] == 'C')
+		play_map_info->collected++;
+	if (map[x][y] == 'E')
+		play_map_info->exits++;
+	map[x][y] = '1';
+	if (play_map_info->collected == play_map_info->nb_c
+		&& play_map_info->exits == 1)
+		return (1);
+	if (flood_fill(map, x + 1, y, play_map_info) || // down
+		flood_fill(map, x - 1, y, play_map_info) || // up
+		flood_fill(map, x, y + 1, play_map_info) || // right
+		flood_fill(map, x, y - 1, play_map_info))   // left
+		return (1);
+	return (0);
 }
+
+char	**copy_map(char **map, int rows)
+{
+	int		i;
+	int		len;
+	char	**copy;
+
+	copy = (char **)malloc(sizeof(char *) * rows);
+	if (copy == NULL)
+		return (NULL);
+	i = 0;
+	while (i < rows)
+	{
+		len = ft_strlen(map[i]);
+		copy[i] = (char *)malloc(sizeof(char) * (len + 1));
+		if (copy[i] == NULL)
+			return (ft_printf("Failed to allocate memory for map copy\n"),
+				NULL);
+		ft_strlcpy(copy[i], map[i], len + 1);
+		i++;
+	}
+	return (copy);
+}
+/* Do some freeing for the mallocs if an error occurs */
 
 int	is_map_valid(char **map, int rows)
 {
 	t_play play_map_info;
-	// int collected;
-	// int exits;
+	char **buffer_map;
 
-    fill_struct_player_map(map, &play_map_info, rows);
-    printf("Player Position X\t\t%d\n", play_map_info.player_x);
-    printf("Player Position Y\t\t%d\n", play_map_info.player_y);
-    printf("Number of collectibles\t\t%d\n", play_map_info.nb_c);
-    printf("Number of rows\t\t%d\n", play_map_info.rows);
-    printf("Number of cols\t\t%d\n", play_map_info.cols);
+	buffer_map = copy_map(map, rows);
 
-    return (flood_fill(map, &play_map_info));
+	for (int i = 0; i < rows; i++)
+	{
+		ft_printf("Buffer Map\t%s\n", buffer_map[i]);
+	}
+
+	fill_struct_player_map(buffer_map, &play_map_info, rows);
+	printf("\nPlayer Position X\t\t%d\n", play_map_info.player_x);
+	printf("Player Position Y\t\t%d\n", play_map_info.player_y);
+	printf("Number of collectibles\t\t%d\n", play_map_info.nb_c);
+	printf("Number collected [counter]\t%d\n", play_map_info.collected);
+	printf("Number exit [counter]\t\t%d\n", play_map_info.exits);
+	printf("Number of rows\t\t\t%d\n", play_map_info.rows);
+	printf("Number of cols\t\t\t%d\n\n", play_map_info.cols);
+
+	if (!(flood_fill(buffer_map, play_map_info.player_x, play_map_info.player_y,
+				&play_map_info)))
+		return (ft_printf("Flood Fill Failed\n"), 0);
+	for (int i = 0; i < rows; i++)
+	{
+		ft_printf("Buffer Map\t%s\n", buffer_map[i]);
+	}
+	printf("Flood fill OKKKKKKKKK\n\n");
+	return (1);
 }
