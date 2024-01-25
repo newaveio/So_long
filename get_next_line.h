@@ -17,15 +17,18 @@
 # endif
 
 # ifndef MAP_FILE
-#  define MAP_FILE "maps/map_2.ber"
+#  define MAP_FILE "maps/map_3.ber"
 # endif
 
 typedef struct s_game
 {
-	char	**map;
-	int		moves;
-	int		collected;
-	int		nb_collectibles;
+	char				**map;
+	int					moves;
+	int					collected;
+	int					nb_collectibles;
+	int					pos_x;
+	int					pos_y;
+	int					rows;
 }						t_game;
 
 typedef struct s_data
@@ -87,6 +90,9 @@ char					**fill_map(int count);
 char					**read_map(int *rows);
 int						ber_extension(const char *filename);
 
+// UTILS_3.C
+
+
 // CHECK_MAP.C
 int						surrounded_by_walls(char **map, int rows);
 int						is_rectangular(char **map, int rows);
@@ -102,9 +108,26 @@ char					**copy_map(char **map, int rows);
 int						is_map_valid(char **map, int rows);
 
 // GAME.C
-void	mvt_ud(t_data *data);
-void	mvt_lr(t_data *data);
-int	on_keypress(int keysym, t_data *data);
-int on_destroy(t_data *data);
+// void					player_move_up(t_data *data);
+// void	player_move_down(t_data *data);
+// void	player_move_left(t_data *data);
+// void	player_move_right(t_data *data);
+void	player_move(t_data *data, int a);
+void	print_map(t_data *data);
+// int						mvt_check_up(t_data *data);
+// int		mvt_check_down(t_data *data);
+// int		mvt_check_left(t_data *data);
+// int		mvt_check_right(t_data *data);
+int		mvt_checker(t_data *data, int a);
+
+int						is_mvt_possible(t_data *data, char *mvt);
+void					mvt_ud(t_data *data, int keysym);
+void					mvt_lr(t_data *data, int keysym);
+
+int						on_keypress(int keysym, t_data *data);
+int						on_destroy(t_data *data);
+
+void					fill_game_struct(t_data *data, char **map, int rows);
+void					fill_data_struct(t_data *data);
 
 #endif
