@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 18:33:35 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/28 21:32:54 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/28 23:35:59 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,15 +173,32 @@ void	initialize_map(t_data *data)
 	}
 }
 
+void	draw_moves(t_data *data)
+{
+	char *moves;
+	char *str_moves;
+	char *buffer;
+
+	moves = ft_strdup("MOVES");
+	str_moves = ft_itoa(data->game->moves);
+	if (data->game->moves != 0)
+	{
+		buffer = ft_itoa(data->game->moves - 1);
+		mlx_string_put(data->mlx_ptr, data->win_ptr, TILE_SIZE * 2.5, (data->game->cols * TILE_SIZE) * .8, 0x000000, buffer);
+		free(buffer);
+	}
+	mlx_string_put(data->mlx_ptr, data->win_ptr, TILE_SIZE, (data->game->cols * TILE_SIZE) * .8, 0xFFFFFF, moves);
+	mlx_string_put(data->mlx_ptr, data->win_ptr, TILE_SIZE * 2.5, (data->game->cols * TILE_SIZE) * .8, 0xFFFFFF, str_moves);
+	free(str_moves);
+	free(moves);
+}
+
 void	ft_update_map(t_data *data, int old_x, int old_y)
 {
-	printf("data->pos x = %d\n", data->game->pos_x);
-	printf("data->pos y = %d\n", data->game->pos_y);
-	printf("data->old x = %d\n", old_x);
-	printf("data->old y = %d\n", old_y);
 	if (old_x != 0 || old_x != 0)
-		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->tile_text[0], old_x * TILE_SIZE, old_y * TILE_SIZE);
-	data->img_to_win = mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0], (data->game->pos_x) * TILE_SIZE, (data->game->pos_y) * 32);
+		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->tile_text[0], old_x * TILE_SIZE, old_y * TILE_SIZE); // tiles
+	data->img_to_win = mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0], (data->game->pos_x) * TILE_SIZE, (data->game->pos_y) * 32); // player
+	draw_moves(data);
 }
 
 int	on_keypress(int keysym, t_data *data)
@@ -223,7 +240,6 @@ void    fill_game_struct(t_data *data, char **map)
 	j = 0;
     data->game->collected = 0;
 	data->game->cols = ft_strlen_nl(map[0]);
-	// printf("Number of columns = %d\n", data->game->cols);
     data->game->moves = 0;
 }
 
@@ -298,5 +314,20 @@ int	ft_init_collectibles(t_data *data)
 		printf("Failed to load collectibles\n");
 		return (0);
 	}
+	return (1);
+}
+
+int ft_load_textures(t_data *data)
+{
+	if(!(ft_init_player(data)))
+		return (0);
+	if (!(ft_init_tiles(data)))
+		return (0);
+	if (!(ft_init_walls(data)))
+		return (0);
+	if (!(ft_init_exit(data)))
+		return (0);
+	if (!(ft_init_collectibles(data)))
+		return (0);
 	return (1);
 }

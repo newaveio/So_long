@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 11:42:58 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/28 17:38:26 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/28 22:49:09 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,44 +60,28 @@ char	**fill_map(int rows)
 
 char	**read_map(t_data *data)
 {
-	// int		count;
 	char	**map;
-
-	// char *line;
     
-	// FIRST PASS - Comptage de line pour ensuite malloc la map
 	data->game->rows = 0;
 	ft_count_map_lines(data);
-	ft_printf("game rows -> %d\n", data->game->rows);
-    
-	// SECOND PASS - Lire dans la map
 	map = fill_map(data->game->rows);
 	if (map == NULL)
 		return (NULL);
-	
-    // check Legal caracters (0 1 C E P)
 	if (!(check_caracters(map, data)))
 	{
 		ft_printf("Maps must only contain these 5 caracters : [0 - 1 - C - P - E]\n");
 		return (NULL);
 	}
-	// Minimum requis At least one C and only one E & P
 	if (!(get_map_info(map, data)))
 		return (NULL);
-	// Is rectangular ??
 	if (!(is_rectangular(map, data)))
 		return (NULL);
-	// Walls surrounded ??
 	if (!(surrounded_by_walls(map, data)))
 		return (NULL);
-	// Is map valid ? Flood Fill
 	if (!(is_map_valid(map, data)))
 		return (NULL);
 	return (map);
 }
-/* We read the map once to get the number of lines 
-	We malloc and store the map with the fill_map function 
-	*/
 
 int	ber_extension(const char *filename)
 {
@@ -109,6 +93,6 @@ int	ber_extension(const char *filename)
 		return (0);
 	flag = ft_strncmp(dot, ".ber", 4);
 	if (flag == 0)
-		return (ft_printf("GOOD EXTENSION FOR MAP\n"), 1);
+		return (1);
 	return (0);
 }

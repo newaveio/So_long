@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 16:09:08 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/28 17:41:51 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/29 00:03:32 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,12 @@ int	surrounded_by_walls(char **map, t_data *data)
 
 	i = 0;
 	len = ft_strlen_nl(map[i]);
-	printf("len = %d\n", len);
 	while (i < len)
 	{
 		if (map[0][i] != '1' || map[data->game->rows - 1][i] != '1')
 			return (0);
 		i++;
 	}
-	// printf("Walls on first and last line\n");
 	i = 0;
 	while (i < data->game->rows)
 	{
@@ -34,7 +32,6 @@ int	surrounded_by_walls(char **map, t_data *data)
 			return (0);
 		i++;
 	}
-	// printf("Walls on first and last column\n");
 	return (1);
 }
 
@@ -167,25 +164,21 @@ void	fill_struct_player_map(char **map, t_data *data)
 
 int	flood_fill(char **map, int x, int y, t_data *data)
 {
-	printf("In Flood Fill");
 	if (y < 0 || y >= data->game->flood->rows || x < 0 || x >= data->game->flood->cols
 		|| map[y][x] == '1')
 		return (0);
 	if (map[y][x] == 'C')
-	{
 		data->game->flood->collected++;
-		printf("Number of collected = %d\n", data->game->flood->collected);
-	}
 	if (map[y][x] == 'E')
 		data->game->flood->exits++;
 	map[y][x] = '1';
 	if (data->game->flood->collected == data->game->nb_collectibles
 		&& data->game->flood->exits == 1)
 		return (1);
-	if (flood_fill(map, x + 1, y, data) || // right
-		flood_fill(map, x - 1, y, data) || // left
-		flood_fill(map, x, y + 1, data) || // down
-		flood_fill(map, x, y - 1, data))   // up
+	if (flood_fill(map, x + 1, y, data) ||
+		flood_fill(map, x - 1, y, data) ||
+		flood_fill(map, x, y + 1, data) ||
+		flood_fill(map, x, y - 1, data))
 		return (1);
 	return (0);
 }
@@ -216,35 +209,13 @@ char	**copy_map(char **map, int rows)
 
 int	is_map_valid(char **map, t_data *data)
 {
-	// t_play play_map_info;
 	char **buffer_map;
 
 	buffer_map = copy_map(map, data->game->rows);
-
-	for (int i = 0; i < data->game->rows; i++)
-	{
-		ft_printf("Buffer Map\t%s\n", buffer_map[i]);
-	}
-
-	printf("OK BEFORE FILL STRUCT PLAYER MAP\n");
 	fill_struct_player_map(buffer_map, data);
-	printf("OK AFTER FILL STRUCT PLAYER MAP\n");
-	printf("\nPlayer Position X\t\t%d\n", data->game->flood->x);
-	printf("Player Position Y\t\t%d\n", data->game->flood->y);
-	printf("Number of collectibles\t\t%d\n", data->game->nb_collectibles);
-	printf("Number collected [counter]\t%d\n", data->game->flood->collected);
-	printf("Number exit [counter]\t\t%d\n", data->game->flood->exits);
-	printf("Number of rows [-1]\t\t%d\n", data->game->flood->rows);
-	printf("Number of cols [-1]\t\t%d\n\n", data->game->flood->cols);
-
 	if (!(flood_fill(buffer_map, data->game->flood->x, data->game->flood->y,
 				data)))
 		return (ft_printf("Flood Fill Failed\n"), 0);
-	for (int i = 0; i < data->game->rows; i++)
-	{
-		ft_printf("Buffer Map\t%s\n", buffer_map[i]);
-	}
-	printf("Flood fill OKKKKKKKKK\n\n");
 	data->game->map = copy_map(map, data->game->rows);
 	return (1);
 }
