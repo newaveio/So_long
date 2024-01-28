@@ -6,13 +6,13 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 16:09:08 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/23 14:45:31 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/28 17:41:51 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	surrounded_by_walls(char **map, int rows)
+int	surrounded_by_walls(char **map, t_data *data)
 {
 	int	i;
 	int	len;
@@ -22,13 +22,13 @@ int	surrounded_by_walls(char **map, int rows)
 	printf("len = %d\n", len);
 	while (i < len)
 	{
-		if (map[0][i] != '1' || map[rows - 1][i] != '1')
+		if (map[0][i] != '1' || map[data->game->rows - 1][i] != '1')
 			return (0);
 		i++;
 	}
 	// printf("Walls on first and last line\n");
 	i = 0;
-	while (i < rows)
+	while (i < data->game->rows)
 	{
 		if (map[i][0] != '1' || map[i][len - 1] != '1')
 			return (0);
@@ -38,7 +38,7 @@ int	surrounded_by_walls(char **map, int rows)
 	return (1);
 }
 
-int	is_rectangular(char **map, int rows)
+int	is_rectangular(char **map, t_data *data)
 {
 	int	i;
 	int	len_first_line;
@@ -46,7 +46,7 @@ int	is_rectangular(char **map, int rows)
 	i = 0;
 	len_first_line = -1;
 	// printf("HELLO WE IN RECTANGULAR\n");
-	while (i < rows)
+	while (i < data->game->rows)
 	{
 		if (len_first_line == -1)
 			len_first_line = ft_strlen_nl(map[i]);
@@ -59,13 +59,13 @@ int	is_rectangular(char **map, int rows)
 	return (1);
 }
 
-int	check_caracters(char **map, int rows)
+int	check_caracters(char **map, t_data *data)
 {
 	int	i;
 	int	j;
 
 	i = 0;
-	while (i < rows)
+	while (i < data->game->rows)
 	{
 		j = 0;
 		while (map[i][j])
@@ -81,104 +81,111 @@ int	check_caracters(char **map, int rows)
 	return (1);
 }
 
-int	check_map_info(t_map_ch map_info)
+int	check_map_info(t_data *data)
 {
-	if (map_info.nb_c < 1)
+	if (data->game->nb_collectibles < 1)
 		return (perror("No collectibles\n"), 0);
-	if (map_info.nb_e != 1)
+	if (data->game->nb_e != 1)
 		return (perror("Must contain only 1 exit\n"), 0);
-	if (map_info.nb_p != 1)
+	if (data->game->nb_p != 1)
 		return (perror("Must contain only 1 player\n"), 0);
 	return (1);
 }
 
-void	get_c_e_p(char **map, int rows, t_map_ch *map_info)
+void	get_c_e_p(char **map, t_data *data)
 {
 	int	i;
 	int	j;
 
 	i = 0;
 	j = 0;
-	map_info->nb_c = 0;
-	map_info->nb_e = 0;
-	map_info->nb_p = 0;
-	while (i < rows)
+	data->game->nb_collectibles = 0;
+	data->game->nb_e = 0;
+	data->game->nb_p = 0;
+	while (i < data->game->rows)
 	{
 		j = 0;
 		while (map[i][j])
 		{
 			if (map[i][j] == 'C')
-				map_info->nb_c++;
+				data->game->nb_collectibles++;
 			if (map[i][j] == 'E')
-				map_info->nb_e++;
+				data->game->nb_e++;
 			if (map[i][j] == 'P')
-				map_info->nb_p++;
+				data->game->nb_p++;
 			j++;
 		}
 		i++;
 	}
 }
 
-int	get_map_info(char **map, int rows)
+int	get_map_info(char **map, t_data *data)
 {
 	int			i;
 	int			j;
-	t_map_ch	map_info;
+	// t_map_ch	map_info;
 
 	i = 0;
 	j = 0;
-	get_c_e_p(map, rows, &map_info);
-	if (!(check_map_info(map_info)))
+	get_c_e_p(map, data);
+	if (!(check_map_info(data)))
 		return (0);
 	return (1);
 }
 
-void	fill_struct_player_map(char **map, t_play *play_map_info, int rows)
+void	fill_struct_player_map(char **map, t_data *data)
 {
 	int	i;
 	int	j;
 
-	i = -1;
+	i = 0;
 	j = 0;
-	play_map_info->nb_c = 0;
-	while (++i < rows)
+	data->game->flood = (t_flood *)malloc(sizeof(t_flood)); // Do else where maybe ???
+	if (data->game->flood == NULL)
+		return ;
+	while (i < data->game->rows)
 	{
 		j = 0;
 		while (map[i][j])
 		{
-			if (map[i][j] == 'C')
-				play_map_info->nb_c++;
 			if (map[i][j] == 'P')
 			{
-				play_map_info->player_x = i;
-				play_map_info->player_y = j;
+				data->game->pos_y = i;
+				data->game->flood->y = i;
+				data->game->pos_x = j;
+				data->game->flood->x = j;
 			}
 			j++;
 		}
+		i++;
 	}
-	play_map_info->collected = 0;
-	play_map_info->exits = 0;
-	play_map_info->rows = rows - 1;
-	play_map_info->cols = ft_strlen_nl(map[0]) - 1;
+	data->game->flood->collected = 0;
+	data->game->flood->exits = 0;
+	data->game->flood->rows = data->game->rows - 1;
+	data->game->flood->cols = ft_strlen_nl(map[0]) - 1;
 }
 
-int	flood_fill(char **map, int x, int y, t_play *play_map_info)
+int	flood_fill(char **map, int x, int y, t_data *data)
 {
-	if (x < 0 || x >= play_map_info->rows || y < 0 || y >= play_map_info->cols
-		|| map[x][y] == '1')
+	printf("In Flood Fill");
+	if (y < 0 || y >= data->game->flood->rows || x < 0 || x >= data->game->flood->cols
+		|| map[y][x] == '1')
 		return (0);
-	if (map[x][y] == 'C')
-		play_map_info->collected++;
-	if (map[x][y] == 'E')
-		play_map_info->exits++;
-	map[x][y] = '1';
-	if (play_map_info->collected == play_map_info->nb_c
-		&& play_map_info->exits == 1)
+	if (map[y][x] == 'C')
+	{
+		data->game->flood->collected++;
+		printf("Number of collected = %d\n", data->game->flood->collected);
+	}
+	if (map[y][x] == 'E')
+		data->game->flood->exits++;
+	map[y][x] = '1';
+	if (data->game->flood->collected == data->game->nb_collectibles
+		&& data->game->flood->exits == 1)
 		return (1);
-	if (flood_fill(map, x + 1, y, play_map_info) || // down
-		flood_fill(map, x - 1, y, play_map_info) || // up
-		flood_fill(map, x, y + 1, play_map_info) || // right
-		flood_fill(map, x, y - 1, play_map_info))   // left
+	if (flood_fill(map, x + 1, y, data) || // right
+		flood_fill(map, x - 1, y, data) || // left
+		flood_fill(map, x, y + 1, data) || // down
+		flood_fill(map, x, y - 1, data))   // up
 		return (1);
 	return (0);
 }
@@ -207,34 +214,37 @@ char	**copy_map(char **map, int rows)
 }
 /* Do some freeing for the mallocs if an error occurs */
 
-int	is_map_valid(char **map, int rows)
+int	is_map_valid(char **map, t_data *data)
 {
-	t_play play_map_info;
+	// t_play play_map_info;
 	char **buffer_map;
 
-	buffer_map = copy_map(map, rows);
+	buffer_map = copy_map(map, data->game->rows);
 
-	for (int i = 0; i < rows; i++)
+	for (int i = 0; i < data->game->rows; i++)
 	{
 		ft_printf("Buffer Map\t%s\n", buffer_map[i]);
 	}
 
-	fill_struct_player_map(buffer_map, &play_map_info, rows);
-	printf("\nPlayer Position X\t\t%d\n", play_map_info.player_x);
-	printf("Player Position Y\t\t%d\n", play_map_info.player_y);
-	printf("Number of collectibles\t\t%d\n", play_map_info.nb_c);
-	printf("Number collected [counter]\t%d\n", play_map_info.collected);
-	printf("Number exit [counter]\t\t%d\n", play_map_info.exits);
-	printf("Number of rows\t\t\t%d\n", play_map_info.rows);
-	printf("Number of cols\t\t\t%d\n\n", play_map_info.cols);
+	printf("OK BEFORE FILL STRUCT PLAYER MAP\n");
+	fill_struct_player_map(buffer_map, data);
+	printf("OK AFTER FILL STRUCT PLAYER MAP\n");
+	printf("\nPlayer Position X\t\t%d\n", data->game->flood->x);
+	printf("Player Position Y\t\t%d\n", data->game->flood->y);
+	printf("Number of collectibles\t\t%d\n", data->game->nb_collectibles);
+	printf("Number collected [counter]\t%d\n", data->game->flood->collected);
+	printf("Number exit [counter]\t\t%d\n", data->game->flood->exits);
+	printf("Number of rows [-1]\t\t%d\n", data->game->flood->rows);
+	printf("Number of cols [-1]\t\t%d\n\n", data->game->flood->cols);
 
-	if (!(flood_fill(buffer_map, play_map_info.player_x, play_map_info.player_y,
-				&play_map_info)))
+	if (!(flood_fill(buffer_map, data->game->flood->x, data->game->flood->y,
+				data)))
 		return (ft_printf("Flood Fill Failed\n"), 0);
-	for (int i = 0; i < rows; i++)
+	for (int i = 0; i < data->game->rows; i++)
 	{
 		ft_printf("Buffer Map\t%s\n", buffer_map[i]);
 	}
 	printf("Flood fill OKKKKKKKKK\n\n");
+	data->game->map = copy_map(map, data->game->rows);
 	return (1);
 }

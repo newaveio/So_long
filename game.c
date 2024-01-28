@@ -6,13 +6,55 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 18:33:35 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/25 20:04:31 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/28 21:32:54 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 void	player_move(t_data *data, int a)
+{
+	int flag;
+
+	data->game->old_x = data->game->pos_x;
+	data->game->old_y = data->game->pos_y;
+	if (a == 1 || a == 3)
+		flag = -1;
+	else
+		flag = 1;
+	data->game->map[data->game->pos_y][data->game->pos_x] = '0';
+	if (a == 3 || a == 4)
+	{
+		if (data->game->map[data->game->pos_y][data->game->pos_x+flag] == 'C')
+			data->game->collected++;
+		if (data->game->map[data->game->pos_y][data->game->pos_x+flag] == 'E' && data->game->collected == data->game->nb_collectibles)
+		{
+			data->game->moves++;
+			ft_printf("Number of moves = %d\n", data->game->moves);
+			on_destroy(data);
+		}
+		data->game->map[data->game->pos_y][data->game->pos_x+flag] = 'P';
+		data->game->pos_x += flag;
+		data->game->moves++;
+	}
+	else
+	{
+		if (data->game->map[data->game->pos_y+flag][data->game->pos_x] == 'C')
+			data->game->collected++;
+		if (data->game->map[data->game->pos_y+flag][data->game->pos_x] == 'E' && data->game->collected == data->game->nb_collectibles)
+		{
+			data->game->moves++;
+			ft_printf("Number of moves = %d\n", data->game->moves);
+			on_destroy(data);
+		}
+		data->game->map[data->game->pos_y+flag][data->game->pos_x] = 'P';
+		data->game->pos_y += flag;
+		data->game->moves++;
+	}
+	print_map(data);
+}
+
+int		mvt_checker(t_data *data, int a)
 {
 	int x;
 	int y;
@@ -24,64 +66,20 @@ void	player_move(t_data *data, int a)
 		flag = -1;
 	else
 		flag = 1;
-	data->game->map[x][y] = '0';
-	if (a == 1 || a == 2)
+	if (a == 3 || a == 4)
 	{
-		if (data->game->map[x+flag][y] == 'C')
-			data->game->collected++;
-		if (data->game->map[x+flag][y] == 'E' && data->game->collected == data->game->nb_collectibles)
-		{
-			data->game->moves++;
-			ft_printf("Number of moves = %d\n", data->game->moves);
-			on_destroy(data);
-		}
-		data->game->map[x+flag][y] = 'P';
-		data->game->pos_x += flag;
-		data->game->moves++;
-	}
-	else
-	{
-		if (data->game->map[x][y+flag] == 'C')
-			data->game->collected++;
-		if (data->game->map[x][y+flag] == 'E' && data->game->collected == data->game->nb_collectibles)
-		{
-			data->game->moves++;
-			ft_printf("Number of moves = %d\n", data->game->moves);
-			on_destroy(data);
-		}
-		data->game->map[x][y+flag] = 'P';
-		data->game->pos_y += flag;
-		data->game->moves++;
-	}
-	print_map(data);
-}
-
-int		mvt_checker(t_data *data, int a)
-{
-	int x; // remove and change structure to make it shorter ex: d->g->x
-	int y; // remove and change structure to make it shorter ex: d->g->y
-	int flag;
-
-	x = data->game->pos_x; // remove and change structure to make it shorter ex: d->g->x
-	y = data->game->pos_y; // remove and change structure to make it shorter ex: d->g->y
-	if (a == 1 || a == 3)
-		flag = -1;
-	else
-		flag = 1;
-	if (a == 1 || a == 2)
-	{
-		if (data->game->map[x+flag][y] != '1' && data->game->map[x+flag][y] != 'E')
+		if (data->game->map[y][x+flag] != '1' && data->game->map[y][x+flag] != 'E')
 			return (1);
-		if (data->game->map[x+flag][y] == 'E' && data->game->collected == data->game->nb_collectibles)
+		if (data->game->map[y][x+flag] == 'E' && data->game->collected == data->game->nb_collectibles)
 			return (1);
 		else
 			return (print_map(data), 0);
 	}
 	else
 	{
-		if (data->game->map[x][y+flag] != '1' && data->game->map[x][y+flag] != 'E')
+		if (data->game->map[y+flag][x] != '1' && data->game->map[y+flag][x] != 'E')
 			return (1);
-		if (data->game->map[x][y+flag] == 'E' && data->game->collected == data->game->nb_collectibles)
+		if (data->game->map[y+flag][x] == 'E' && data->game->collected == data->game->nb_collectibles)
 			return (1);
 		else
 			return (print_map(data), 0);
@@ -147,6 +145,44 @@ void	mvt_lr(t_data *data, int keysym)
 	}
 }
 
+void	initialize_map(t_data *data)
+{
+	int x;
+	int y;
+	
+	y = 0;
+	while (y < data->game->rows)
+	{
+		x = 0;
+		while (x < data->game->cols)
+		{
+			if (data->game->map[y][x] == '0')
+				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->tile_text[0], x * TILE_SIZE, y * TILE_SIZE);
+			if (data->game->map[y][x] == 'P')
+				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0], x * TILE_SIZE, y * TILE_SIZE);
+			if (data->game->map[y][x] == '1')
+				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->wall_text[0], x * TILE_SIZE, y * TILE_SIZE);
+			if (data->game->map[y][x] == 'E')
+				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->exit_text[0], x * TILE_SIZE, y * TILE_SIZE);
+			if (data->game->map[y][x] == 'C')
+				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->collec_text[0], x * TILE_SIZE, y * TILE_SIZE);
+				
+			x++;
+		}
+		y++;
+	}
+}
+
+void	ft_update_map(t_data *data, int old_x, int old_y)
+{
+	printf("data->pos x = %d\n", data->game->pos_x);
+	printf("data->pos y = %d\n", data->game->pos_y);
+	printf("data->old x = %d\n", old_x);
+	printf("data->old y = %d\n", old_y);
+	if (old_x != 0 || old_x != 0)
+		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->tile_text[0], old_x * TILE_SIZE, old_y * TILE_SIZE);
+	data->img_to_win = mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0], (data->game->pos_x) * TILE_SIZE, (data->game->pos_y) * 32);
+}
 
 int	on_keypress(int keysym, t_data *data)
 {
@@ -158,6 +194,7 @@ int	on_keypress(int keysym, t_data *data)
 		return (on_destroy(data));
 	ft_printf("Collected\t%d/%d\n", data->game->collected, data->game->nb_collectibles);
 	ft_printf("Number of moves = %d\n", data->game->moves);
+	ft_update_map(data, data->game->old_x, data->game->old_y);
 	return (0);
 }
 /* 65362 up - 65364 down - 65361 left - 65363 right - 65307 esc */
@@ -176,32 +213,90 @@ void	fill_data_struct(t_data *data)
 	data->game = (t_game *)malloc(sizeof(t_game));	
 }
 
-void    fill_game_struct(t_data *data, char **map, int rows)
+void    fill_game_struct(t_data *data, char **map)
 {
 	int i;
 	int j;
+	(void)map;
 	
 	i = 0;
 	j = 0;
     data->game->collected = 0;
+	data->game->cols = ft_strlen_nl(map[0]);
+	// printf("Number of columns = %d\n", data->game->cols);
     data->game->moves = 0;
-	data->game->nb_collectibles = 0;
-	data->game->rows = rows;
-	while (i < rows)
+}
+
+int	ft_init_player(t_data *data)
+{
+	int x;
+	int y;
+
+	x = 32;
+	y = 32;
+	data->player_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/player/coin_1.xpm", &x, &y);
+	if (data->player_text[0] == NULL)
+		return (0);
+	return (1);
+}
+
+int	ft_init_tiles(t_data *data)
+{
+	int x;
+	int y;
+
+	x = 32;
+	y = 32;
+	data->tile_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/tiles/tile_1.xpm", &x, &y);
+	if (data->tile_text[0] == NULL)
+		return (0);
+	return (1);
+}
+
+int	ft_init_walls(t_data *data)
+{
+	int x;
+	int y;
+
+	x = 32;
+	y = 32;
+	data->wall_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/wall/wall_1.xpm", &x, &y);
+	if (data->wall_text[0] == NULL)
 	{
-		j = 0;
-		while (map[i][j])
-		{
-			if (map[i][j] == 'C')
-				data->game->nb_collectibles++;
-			if (map[i][j] == 'P')
-			{
-				data->game->pos_x = i;
-				data->game->pos_y = j;
-			}
-			j++;
-		}
-		i++;
+		printf("Failed to load walls\n");
+		return (0);
 	}
-    data->game->map = copy_map(map, rows);
+	return (1);
+}
+
+int	ft_init_exit(t_data *data)
+{
+	int x;
+	int y;
+
+	x = 32;
+	y = 32;
+	data->exit_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/exit/ex_1.xpm", &x, &y);
+	if (data->exit_text[0] == NULL)
+	{
+		printf("Failed to load exit\n");
+		return (0);
+	}
+	return (1);
+}
+
+int	ft_init_collectibles(t_data *data)
+{
+	int x;
+	int y;
+	
+	x = 32;
+	y = 32;
+	data->collec_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/collectible/col_1.xpm", &x, &y);
+	if (data->collec_text[0] == NULL)
+	{
+		printf("Failed to load collectibles\n");
+		return (0);
+	}
+	return (1);
 }

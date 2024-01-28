@@ -6,13 +6,13 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 11:42:58 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/23 14:45:38 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/28 17:38:26 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_count_map_lines(int *count)
+int	ft_count_map_lines(t_data *data)
 {
 	int		fd;
 	char	*line;
@@ -23,13 +23,13 @@ int	ft_count_map_lines(int *count)
 	while ((line = get_next_line(fd)) != NULL)
 	{
 		free(line);
-		(*count)++;
+		(data->game->rows)++;
 	}
 	close(fd);
 	return (1);
 }
 
-char	**fill_map(int count)
+char	**fill_map(int rows)
 {
 	int		i;
 	int		fd;
@@ -37,7 +37,7 @@ char	**fill_map(int count)
     char    *line;
 	char	**map;
 
-	map = (char **)malloc(count * sizeof(char *));
+	map = (char **)malloc(rows * sizeof(char *));
 	if (map == NULL)
 		return (perror("Failed to allocate memory for the map\n"), NULL);
 	fd = open(MAP_FILE, O_RDONLY);
@@ -58,43 +58,40 @@ char	**fill_map(int count)
     return (map);
 }
 
-char	**read_map(int *rows)
+char	**read_map(t_data *data)
 {
-	int		count;
+	// int		count;
 	char	**map;
 
 	// char *line;
     
 	// FIRST PASS - Comptage de line pour ensuite malloc la map
-	count = 0;
-	ft_count_map_lines(&count);
-	ft_printf("Count = %d\n", count);
-	*rows = count;
+	data->game->rows = 0;
+	ft_count_map_lines(data);
+	ft_printf("game rows -> %d\n", data->game->rows);
     
 	// SECOND PASS - Lire dans la map
-	map = fill_map(count);
+	map = fill_map(data->game->rows);
 	if (map == NULL)
 		return (NULL);
 	
-	// BASIC CHECK - Legal caracters (0 1 C E P) - At least one C and only one E & P - Rectangular - Walls
-	printf("Number of rows = %d\n", count);
-    // check_caracters(map, *rows);
-	if (!(check_caracters(map, count)))
+    // check Legal caracters (0 1 C E P)
+	if (!(check_caracters(map, data)))
 	{
 		ft_printf("Maps must only contain these 5 caracters : [0 - 1 - C - P - E]\n");
 		return (NULL);
 	}
-	// Minimum requis
-	if (!(get_map_info(map, count)))
+	// Minimum requis At least one C and only one E & P
+	if (!(get_map_info(map, data)))
 		return (NULL);
 	// Is rectangular ??
-	if (!(is_rectangular(map, count)))
+	if (!(is_rectangular(map, data)))
 		return (NULL);
 	// Walls surrounded ??
-	if (!(surrounded_by_walls(map, count)))
+	if (!(surrounded_by_walls(map, data)))
 		return (NULL);
 	// Is map valid ? Flood Fill
-	if (!(is_map_valid(map, count)))
+	if (!(is_map_valid(map, data)))
 		return (NULL);
 	return (map);
 }
