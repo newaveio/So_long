@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 16:39:41 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/28 23:26:14 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/29 18:18:48 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,7 @@ int	main(void)
 	data.mlx_ptr = mlx_init();
 	if (data.mlx_ptr == NULL)
 		return (1);
-	int window_w = data.game->cols * TILE_SIZE; // add in structure
-	int window_h = data.game->rows * TILE_SIZE; // add in structure
-	data.win_ptr = mlx_new_window(data.mlx_ptr, window_w, window_h + 200, "So Long :D");
+	data.win_ptr = mlx_new_window(data.mlx_ptr, data.window->width, data.window->height + EXTRA_HEIGHT, "So Long :D"); // make it general
 	if (data.win_ptr == NULL)
 		return (free(data.mlx_ptr), 1);
 	if (!(ft_load_textures(&data)))
@@ -41,6 +39,7 @@ int	main(void)
 	initialize_map(&data);
 	mlx_hook(data.win_ptr, KeyRelease, KeyReleaseMask, &on_keypress, &data);
 	mlx_hook(data.win_ptr, DestroyNotify, StructureNotifyMask, &on_destroy, &data);
+	mlx_loop_hook(data.mlx_ptr, animation_update, &data);
 	mlx_loop(data.mlx_ptr);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 11:42:58 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/28 22:49:09 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/30 22:06:02 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ char	**read_map(t_data *data)
 		return (NULL);
 	if (!(check_caracters(map, data)))
 	{
-		ft_printf("Maps must only contain these 5 caracters : [0 - 1 - C - P - E]\n");
+		ft_printf("Maps must only contain these 6 caracters : [0 - 1 - C - P - E - X]\n");
 		return (NULL);
 	}
 	if (!(get_map_info(map, data)))

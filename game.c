@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 18:33:35 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/28 23:35:59 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/30 23:56:33 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,12 @@ void	player_move(t_data *data, int a)
 	{
 		if (data->game->map[data->game->pos_y][data->game->pos_x+flag] == 'C')
 			data->game->collected++;
+		if (data->game->map[data->game->pos_y][data->game->pos_x+flag] == 'X')
+		{
+			data->game->moves++;
+			ft_printf("Number of moves = %d\n", data->game->moves);
+			on_destroy(data);
+		}
 		if (data->game->map[data->game->pos_y][data->game->pos_x+flag] == 'E' && data->game->collected == data->game->nb_collectibles)
 		{
 			data->game->moves++;
@@ -41,6 +47,12 @@ void	player_move(t_data *data, int a)
 	{
 		if (data->game->map[data->game->pos_y+flag][data->game->pos_x] == 'C')
 			data->game->collected++;
+		if (data->game->map[data->game->pos_y+flag][data->game->pos_x] == 'X')
+		{
+			data->game->moves++;
+			ft_printf("Number of moves = %d\n", data->game->moves);
+			on_destroy(data);
+		}
 		if (data->game->map[data->game->pos_y+flag][data->game->pos_x] == 'E' && data->game->collected == data->game->nb_collectibles)
 		{
 			data->game->moves++;
@@ -166,7 +178,8 @@ void	initialize_map(t_data *data)
 				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->exit_text[0], x * TILE_SIZE, y * TILE_SIZE);
 			if (data->game->map[y][x] == 'C')
 				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->collec_text[0], x * TILE_SIZE, y * TILE_SIZE);
-				
+			if (data->game->map[y][x] == 'X')
+				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->opps_text[0], x * TILE_SIZE, y * TILE_SIZE);
 			x++;
 		}
 		y++;
@@ -184,11 +197,11 @@ void	draw_moves(t_data *data)
 	if (data->game->moves != 0)
 	{
 		buffer = ft_itoa(data->game->moves - 1);
-		mlx_string_put(data->mlx_ptr, data->win_ptr, TILE_SIZE * 2.5, (data->game->cols * TILE_SIZE) * .8, 0x000000, buffer);
+		mlx_string_put(data->mlx_ptr, data->win_ptr, TILE_SIZE * 2.5, data->window->height + (EXTRA_HEIGHT * .5), 0x000000, buffer);
 		free(buffer);
 	}
-	mlx_string_put(data->mlx_ptr, data->win_ptr, TILE_SIZE, (data->game->cols * TILE_SIZE) * .8, 0xFFFFFF, moves);
-	mlx_string_put(data->mlx_ptr, data->win_ptr, TILE_SIZE * 2.5, (data->game->cols * TILE_SIZE) * .8, 0xFFFFFF, str_moves);
+	mlx_string_put(data->mlx_ptr, data->win_ptr, TILE_SIZE, data->window->height + (EXTRA_HEIGHT * .5), 0xFFFFFF, moves);
+	mlx_string_put(data->mlx_ptr, data->win_ptr, TILE_SIZE * 2.5, data->window->height + (EXTRA_HEIGHT * .5), 0xFFFFFF, str_moves);
 	free(str_moves);
 	free(moves);
 }
@@ -227,7 +240,8 @@ int on_destroy(t_data *data)
 
 void	fill_data_struct(t_data *data)
 {
-	data->game = (t_game *)malloc(sizeof(t_game));	
+	data->game = (t_game *)malloc(sizeof(t_game));
+	data->window = (t_window *)malloc(sizeof(t_window));
 }
 
 void    fill_game_struct(t_data *data, char **map)
@@ -241,6 +255,8 @@ void    fill_game_struct(t_data *data, char **map)
     data->game->collected = 0;
 	data->game->cols = ft_strlen_nl(map[0]);
     data->game->moves = 0;
+	data->window->width = data->game->cols * TILE_SIZE;
+	data->window->height = data->game->rows * TILE_SIZE;
 }
 
 int	ft_init_player(t_data *data)
@@ -252,7 +268,7 @@ int	ft_init_player(t_data *data)
 	y = 32;
 	data->player_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/player/coin_1.xpm", &x, &y);
 	if (data->player_text[0] == NULL)
-		return (0);
+		return (ft_printf("[TEXTURE] - Failed to load player\n"), 0);
 	return (1);
 }
 
@@ -263,9 +279,9 @@ int	ft_init_tiles(t_data *data)
 
 	x = 32;
 	y = 32;
-	data->tile_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/tiles/tile_1.xpm", &x, &y);
+	data->tile_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/tiles/tile_3.xpm", &x, &y);
 	if (data->tile_text[0] == NULL)
-		return (0);
+		return (ft_printf("[TEXTURE] - Failed to load tiles\n"), 0);
 	return (1);
 }
 
@@ -276,27 +292,31 @@ int	ft_init_walls(t_data *data)
 
 	x = 32;
 	y = 32;
-	data->wall_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/wall/wall_1.xpm", &x, &y);
+	data->wall_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/wall/wall_2.xpm", &x, &y);
 	if (data->wall_text[0] == NULL)
-	{
-		printf("Failed to load walls\n");
-		return (0);
-	}
+		return (ft_printf("[TEXTURE] - Failed to load walls\n"), 0);
 	return (1);
 }
 
 int	ft_init_exit(t_data *data)
 {
+	int i;
 	int x;
 	int y;
+	char *buf;
+	char *file;
 
+	i = 0;
 	x = 32;
 	y = 32;
-	data->exit_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/exit/ex_1.xpm", &x, &y);
-	if (data->exit_text[0] == NULL)
+	while (i < 5)
 	{
-		printf("Failed to load exit\n");
-		return (0);
+		buf = ft_strjoin("assets/exit/exit_", ft_itoa(i+1));
+		file = ft_strjoin(buf, ".xpm");
+		data->exit_text[i] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/exit/exit_2.xpm", &x, &y);
+		if (data->exit_text[i] == NULL)
+			return (ft_printf("[TEXTURE] - Failed to load exit\n"), 0);
+		i++;
 	}
 	return (1);
 }
@@ -310,9 +330,29 @@ int	ft_init_collectibles(t_data *data)
 	y = 32;
 	data->collec_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/collectible/col_1.xpm", &x, &y);
 	if (data->collec_text[0] == NULL)
+		return (ft_printf("[TEXTURE] - Failed to load collectibles\n"), 0);
+	return (1);
+}
+
+int	ft_init_opps(t_data *data)
+{
+	int i;
+	int x;
+	int y;
+	char *buf;
+	char *file;
+	
+	i = 0;
+	x = 32;
+	y = 32;
+	while (i < 4)
 	{
-		printf("Failed to load collectibles\n");
-		return (0);
+		buf = ft_strjoin("assets/opps/op1/op1_", ft_itoa(i+1));
+		file = ft_strjoin(buf, ".xpm");
+		data->opps_text[i] = mlx_xpm_file_to_image(data->mlx_ptr, file, &x, &y);
+		if (data->opps_text[i] == NULL)
+			return (ft_printf("[TEX	data->enemies = (t_enemies *)malloc()TURE] - Failed to load opps (%d)\n", i+1), 0);
+		i++;
 	}
 	return (1);
 }
@@ -329,5 +369,23 @@ int ft_load_textures(t_data *data)
 		return (0);
 	if (!(ft_init_collectibles(data)))
 		return (0);
+	if (!(ft_init_opps(data)))
+		return (0);
 	return (1);
+}
+
+int	animation_update(void *param)
+{
+	int i;
+
+	i = 0;
+	t_data *data = (t_data *)param;
+	data->anim_counter++;
+	int current_frame = (data->anim_counter / 2) % 4;
+	while (i < data->game->nb_x)
+	{
+		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->opps_text[current_frame], data->enemies[i].x * TILE_SIZE, data->enemies[i].y * TILE_SIZE);
+		i++;
+	}
+	return (0);
 }

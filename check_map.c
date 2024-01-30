@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 16:09:08 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/29 00:03:32 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/30 22:34:35 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,15 +42,12 @@ int	is_rectangular(char **map, t_data *data)
 
 	i = 0;
 	len_first_line = -1;
-	// printf("HELLO WE IN RECTANGULAR\n");
 	while (i < data->game->rows)
 	{
 		if (len_first_line == -1)
 			len_first_line = ft_strlen_nl(map[i]);
 		else if (ft_strlen_nl(map[i]) != len_first_line)
 			return (perror("Map is not rectangular\n"), 0);
-		// printf("len first line = %d\n", len_first_line);
-		// printf("len line = %d\n", ft_strlen_nl(map[i]));
 		i++;
 	}
 	return (1);
@@ -68,7 +65,7 @@ int	check_caracters(char **map, t_data *data)
 		while (map[i][j])
 		{
 			if (map[i][j] == '0' || map[i][j] == '1' || map[i][j] == 'C'
-				|| map[i][j] == 'E' || map[i][j] == 'P')
+				|| map[i][j] == 'E' || map[i][j] == 'P' || map[i][j] == 'X')
 				j++;
 			else
 				return (0); // Error occured
@@ -94,15 +91,15 @@ void	get_c_e_p(char **map, t_data *data)
 	int	i;
 	int	j;
 
-	i = 0;
-	j = 0;
+	i = -1;
 	data->game->nb_collectibles = 0;
 	data->game->nb_e = 0;
 	data->game->nb_p = 0;
-	while (i < data->game->rows)
+	data->game->nb_x = 0;
+	while (++i < data->game->rows)
 	{
-		j = 0;
-		while (map[i][j])
+		j = -1;
+		while (map[i][++j])
 		{
 			if (map[i][j] == 'C')
 				data->game->nb_collectibles++;
@@ -110,21 +107,56 @@ void	get_c_e_p(char **map, t_data *data)
 				data->game->nb_e++;
 			if (map[i][j] == 'P')
 				data->game->nb_p++;
+			if (map[i][j] == 'X')
+				data->game->nb_x++;
+		}
+	}
+}
+
+void	fill_enemies(char **map, t_data *data)
+{
+	int	i;
+	int	j;
+	int	index;
+
+	i = 0;
+	index = 0;
+	data->enemies = (t_enemies *)malloc(data->game->nb_x * sizeof(t_enemies));
+	if (data->enemies == NULL)
+		return ;
+	while (i < data->game->rows)
+	{
+		j = 0;
+		while (map[i][j])
+		{
+			if (map[i][j] == 'X')
+			{
+				data->enemies[index].x = j;
+				data->enemies[index].y = i;
+				index++;
+			}
 			j++;
 		}
 		i++;
+	}
+	index = 0;
+	while (index < data->game->nb_x)
+	{
+		printf("enemie[%d].x = %d\n", index, data->enemies[index].x);
+		printf("enemie[%d].y = %d\n", index, data->enemies[index].y);
+		index++;
 	}
 }
 
 int	get_map_info(char **map, t_data *data)
 {
-	int			i;
-	int			j;
-	// t_map_ch	map_info;
+	int	i;
+	int	j;
 
 	i = 0;
 	j = 0;
 	get_c_e_p(map, data);
+	fill_enemies(map, data);
 	if (!(check_map_info(data)))
 		return (0);
 	return (1);
@@ -137,7 +169,8 @@ void	fill_struct_player_map(char **map, t_data *data)
 
 	i = 0;
 	j = 0;
-	data->game->flood = (t_flood *)malloc(sizeof(t_flood)); // Do else where maybe ???
+	data->game->flood = (t_flood *)malloc(sizeof(t_flood));
+	// Do else where maybe ???
 	if (data->game->flood == NULL)
 		return ;
 	while (i < data->game->rows)
@@ -162,23 +195,35 @@ void	fill_struct_player_map(char **map, t_data *data)
 	data->game->flood->cols = ft_strlen_nl(map[0]) - 1;
 }
 
-int	flood_fill(char **map, int x, int y, t_data *data)
+int	flood_fill_c(char **map, int x, int y, t_data *data)
 {
-	if (y < 0 || y >= data->game->flood->rows || x < 0 || x >= data->game->flood->cols
-		|| map[y][x] == '1')
+	if (y < 0 || y >= data->game->flood->rows || x < 0
+		|| x >= data->game->flood->cols || map[y][x] == '1' || map[y][x] == 'E'
+		|| map[y][x] == 'X')
 		return (0);
 	if (map[y][x] == 'C')
 		data->game->flood->collected++;
-	if (map[y][x] == 'E')
-		data->game->flood->exits++;
 	map[y][x] = '1';
-	if (data->game->flood->collected == data->game->nb_collectibles
-		&& data->game->flood->exits == 1)
+	if (data->game->flood->collected == data->game->nb_collectibles)
 		return (1);
-	if (flood_fill(map, x + 1, y, data) ||
-		flood_fill(map, x - 1, y, data) ||
-		flood_fill(map, x, y + 1, data) ||
-		flood_fill(map, x, y - 1, data))
+	if (flood_fill_c(map, x + 1, y, data) || flood_fill_c(map, x - 1, y, data)
+		|| flood_fill_c(map, x, y + 1, data) || flood_fill_c(map, x, y - 1,
+			data))
+		return (1);
+	return (0);
+}
+
+int	flood_fill_e(char **map, int x, int y, t_data *data)
+{
+	if (y < 0 || y >= data->game->flood->rows || x < 0
+		|| x >= data->game->flood->cols || map[y][x] == '1' || map[y][x] == 'X')
+		return (0);
+	if (map[y][x] == 'E')
+		return (1);
+	map[y][x] = '1';
+	if (flood_fill_e(map, x + 1, y, data) || flood_fill_e(map, x - 1, y, data)
+		|| flood_fill_e(map, x, y + 1, data) || flood_fill_e(map, x, y - 1,
+			data))
 		return (1);
 	return (0);
 }
@@ -209,12 +254,15 @@ char	**copy_map(char **map, int rows)
 
 int	is_map_valid(char **map, t_data *data)
 {
-	char **buffer_map;
+	char **buffer_map_c;
+	char **buffer_map_e;
 
-	buffer_map = copy_map(map, data->game->rows);
-	fill_struct_player_map(buffer_map, data);
-	if (!(flood_fill(buffer_map, data->game->flood->x, data->game->flood->y,
-				data)))
+	buffer_map_c = copy_map(map, data->game->rows);
+	buffer_map_e = copy_map(map, data->game->rows);
+	fill_struct_player_map(buffer_map_c, data);
+	if (!(flood_fill_c(buffer_map_c, data->game->flood->x, data->game->flood->y,
+				data)) || !(flood_fill_e(buffer_map_e, data->game->flood->x,
+				data->game->flood->y, data)))
 		return (ft_printf("Flood Fill Failed\n"), 0);
 	data->game->map = copy_map(map, data->game->rows);
 	return (1);

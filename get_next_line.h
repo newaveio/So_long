@@ -18,6 +18,8 @@
 
 # define MAP_FILE "maps/map_3.ber"
 # define TILE_SIZE 32
+# define EXTRA_HEIGHT 100
+# define TRANSPARENT_COLOR 0x000000
 # define PLAYER_IMAGE_PATH "assets/player/coin_1.xpm"
 
 typedef struct s_flood
@@ -39,6 +41,7 @@ typedef struct s_game
 	int					nb_collectibles;
 	int					nb_e;
 	int					nb_p;
+	int					nb_x;
 	int					old_x;
 	int					old_y;
 	int					pos_x;
@@ -47,17 +50,33 @@ typedef struct s_game
 	int					cols;
 }						t_game;
 
+typedef struct s_window
+{
+	int					width;
+	int					height;
+}						t_window;
+
+typedef struct s_enemies
+{
+	int x;
+	int y;
+}				t_enemies;
+
 typedef struct s_data
 {
 	void				*mlx_ptr;
 	void				*win_ptr;
 	int					img_to_win;
+	int					anim_counter;
 	void				*player_text[2];
 	void				*tile_text[2];
 	void				*wall_text[2];
-	void				*exit_text[2];
+	void				*exit_text[5];
 	void				*collec_text[2];
+	void				*opps_text[4];
 	t_game				*game;
+	t_window			*window;
+	t_enemies			*enemies;
 }						t_data;
 
 typedef struct s_list_gnl
@@ -103,6 +122,9 @@ void					get_c_e_p(char **map, t_data *data);
 int						get_map_info(char **map, t_data *data);
 void					fill_struct_player_map(char **map, t_data *data);
 int						flood_fill(char **map, int x, int y, t_data *data);
+int						flood_fill_c(char **map, int x, int y, t_data *data);
+int						flood_fill_e(char **map, int x, int y, t_data *data);
+
 char					**copy_map(char **map, int rows);
 int						is_map_valid(char **map, t_data *data);
 
@@ -120,14 +142,15 @@ int						on_destroy(t_data *data);
 
 void					fill_game_struct(t_data *data, char **map);
 void					fill_data_struct(t_data *data);
-int ft_load_textures(t_data *data);
+int						ft_load_textures(t_data *data);
 int						ft_init_player(t_data *data);
 int						ft_init_tiles(t_data *data);
 int						ft_init_walls(t_data *data);
 int						ft_init_exit(t_data *data);
 int						ft_init_collectibles(t_data *data);
-void	draw_moves(t_data *data);
+int						ft_init_opps(t_data *data);
+void					draw_moves(t_data *data);
 void					ft_update_map(t_data *data, int old_x, int old_y);
 void					initialize_map(t_data *data);
-
+int						animation_update(void *param);
 #endif
