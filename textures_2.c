@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/31 11:08:07 by mbest             #+#    #+#             */
-/*   Updated: 2024/02/01 17:15:00 by mbest            ###   ########.fr       */
+/*   Updated: 2024/02/01 21:51:54 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ int	ft_init_opps(t_data *data)
 	char *file;
 	
 	i = 0;
-	x = 32;
-	y = 32;
+	x = TILE_SIZE;
+	y = TILE_SIZE;
 	while (i < 4)
 	{
 		buf = ft_strjoin("assets/opps/op2/op_", ft_itoa(i+1));

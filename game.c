@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 18:33:35 by mbest             #+#    #+#             */
-/*   Updated: 2024/02/01 18:51:44 by mbest            ###   ########.fr       */
+/*   Updated: 2024/02/01 21:58:53 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,21 +158,24 @@ void	mvt_ud(t_data *data, int keysym)
 {
 	if (keysym == 65362)
 	{
-		data->player_dir =
+		data->player_dir = 0;
+		printf("data->player_is_moving = %d\n", data->player_is_moving);
 		if(is_mvt_possible(data, "up"))
 		{
 			data->player_is_moving = 1;
 			player_move(data, 1);
-			data->player_is_moving = 0;
+			printf("data->player_is_moving = %d\n", data->player_is_moving);
 		}
 	}
 	else
 	{
+		data->player_dir = 1;
+		printf("data->player_is_moving = %d\n", data->player_is_moving);
 		if (is_mvt_possible(data, "down"))
 		{
 			data->player_is_moving = 1;
 			player_move(data, 2);
-			data->player_is_moving = 0;
+			printf("data->player_is_moving = %d\n", data->player_is_moving);
 		}
 	}
 }
@@ -181,20 +184,22 @@ void	mvt_lr(t_data *data, int keysym)
 {
 	if (keysym == 65361)
 	{
+		data->player_dir = 2;
 		if (is_mvt_possible(data, "left"))
 		{
 			data->player_is_moving = 1;
 			player_move(data, 3);
-			data->player_is_moving = 0;
+			printf("data->player_is_moving = %d\n", data->player_is_moving);
 		}
 	}
 	else
 	{
+		data->player_dir = 3;
 		if (is_mvt_possible(data, "right"))
 		{
 			data->player_is_moving = 1;
 			player_move(data, 4);
-			data->player_is_moving = 0;
+			printf("data->player_is_moving = %d\n", data->player_is_moving);
 		}
 	}
 }
@@ -212,8 +217,8 @@ void	initialize_map(t_data *data)
 		{
 			if (data->game->map[y][x] == '0')
 				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->tile_text[0], x * TILE_SIZE, y * TILE_SIZE);
-			if (data->game->map[y][x] == 'P')
-				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0], x * TILE_SIZE, y * TILE_SIZE);
+			// if (data->game->map[y][x] == 'P')
+			// 	mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0], x * TILE_SIZE, y * TILE_SIZE);
 			if (data->game->map[y][x] == '1')
 				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->wall_text[0], x * TILE_SIZE, y * TILE_SIZE);
 			if (data->game->map[y][x] == 'E')
@@ -248,14 +253,6 @@ void	draw_moves(t_data *data)
 	free(moves);
 }
 
-void	ft_update_map(t_data *data, int old_x, int old_y)
-{
-	if (old_x != 0 || old_x != 0)
-		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->tile_text[0], old_x * TILE_SIZE, old_y * TILE_SIZE); // tiles
-	data->img_to_win = mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0], (data->game->pos_x) * TILE_SIZE, (data->game->pos_y) * 32); // player
-	draw_moves(data);
-}
-
 int	on_keypress(int keysym, t_data *data)
 {
 	if (keysym == 65362 || keysym == 65364)
@@ -284,6 +281,7 @@ void	fill_data_struct(t_data *data)
 {
 	data->game = (t_game *)malloc(sizeof(t_game));
 	data->window = (t_window *)malloc(sizeof(t_window));
+	data->player_dir = -1;
 }
 
 void    fill_game_struct(t_data *data, char **map)
@@ -299,6 +297,14 @@ void    fill_game_struct(t_data *data, char **map)
     data->game->moves = 0;
 	data->window->width = data->game->cols * TILE_SIZE;
 	data->window->height = data->game->rows * TILE_SIZE;
+}
+
+void	ft_update_map(t_data *data, int old_x, int old_y)
+{
+	if (old_x != 0 || old_y != 0)
+		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->tile_text[0], old_x * TILE_SIZE, old_y * TILE_SIZE); // tiles
+	// data->img_to_win = mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0][0], (data->game->pos_x) * TILE_SIZE, (data->game->pos_y) * 32); // player
+	draw_moves(data);
 }
 
 void anim_opps(t_data *data, int frame)
@@ -332,9 +338,41 @@ void	anim_collectibles(t_data *data, int frame)
 	}	
 }
 
-void	anim_player(t_data *data, int frame)
+// void	anim_player(t_data *data, int frame)
+// {
+// 	printf("player is moving = %d\n", data->player_is_moving);
+// 	printf("player direction = %d\n", data->player_dir);
+// 	printf("frame = %d\n", frame);
+// 	if (data->player_dir == -1)
+// 		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[1][0], data->game->pos_x * TILE_SIZE, data->game->pos_y * TILE_SIZE);
+// 	else if (data->player_is_moving)
+// 	{
+// 		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[data->player_dir][frame], data->game->pos_x * TILE_SIZE, data->game->pos_y * TILE_SIZE);
+// 		data->player_is_moving = 0;
+// 	}
+// 	else
+// 		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[data->player_dir][0], data->game->pos_x * TILE_SIZE, data->game->pos_y * TILE_SIZE);
+// }
+
+void	anim_player(t_data *data)
 {
-	
+	int frame;
+	if (data->player_dir == -1)
+		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[1][0], data->game->pos_x * TILE_SIZE, data->game->pos_y * TILE_SIZE);
+	else if (data->player_is_moving)
+	{
+		if (data->anim_counter[3] % 900 == 0) // Only increment frame every 3 calls
+		{
+		frame = (data->anim_counter[3] / 900) % 8;
+		printf("frame = %d\n", frame);
+		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[data->player_dir][frame], data->game->pos_x * TILE_SIZE, data->game->pos_y * TILE_SIZE);
+		if (frame == 7)
+			data->player_is_moving = 0;
+		}
+		data->anim_counter[3]++;	
+	}
+	else
+		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[data->player_dir][0], data->game->pos_x * TILE_SIZE, data->game->pos_y * TILE_SIZE);
 }
 
 int	animation_update(void *param)
@@ -342,18 +380,18 @@ int	animation_update(void *param)
 	int opps_frame;
 	int exit_frame;
 	int col_frame;
-	int player_frame;
+	// int player_frame;
 
 	t_data *data = (t_data *)param;
-	opps_frame = (data->anim_counter[0]++ / 2000) % 4;
+	opps_frame = (data->anim_counter[0]++ / 5000) % 4;
 	exit_frame = (data->anim_counter[1]++ / 4000) % 4 + 1;
-	col_frame = (data->anim_counter[2]++ / 2000) % 4;
-	player_frame = (data->anim_counter[3]++ / 500) % 8;
+	col_frame = (data->anim_counter[2]++ / 3000) % 4;
+	// player_frame = (data->anim_counter[3]++ / 10) % 8;
 	anim_opps(data, opps_frame);
 	anim_exit(data, exit_frame);
 	anim_collectibles(data, col_frame);
-	anim_player(data, player_frame);
-	// mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0], data->game->pos_x * TILE_SIZE, data->game->pos_y * TILE_SIZE);
+	anim_player(data);
+	// anim_player(data, player_frame);
 	return (0);
 }
 
