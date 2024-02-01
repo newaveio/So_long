@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 18:33:35 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/30 23:56:33 by mbest            ###   ########.fr       */
+/*   Updated: 2024/02/01 18:51:44 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,10 @@ void	player_move(t_data *data, int a)
 	if (a == 3 || a == 4)
 	{
 		if (data->game->map[data->game->pos_y][data->game->pos_x+flag] == 'C')
+		{
+			collect(data, flag);
 			data->game->collected++;
+		}
 		if (data->game->map[data->game->pos_y][data->game->pos_x+flag] == 'X')
 		{
 			data->game->moves++;
@@ -46,7 +49,10 @@ void	player_move(t_data *data, int a)
 	else
 	{
 		if (data->game->map[data->game->pos_y+flag][data->game->pos_x] == 'C')
+		{
+			collect(data, flag);
 			data->game->collected++;
+		}
 		if (data->game->map[data->game->pos_y+flag][data->game->pos_x] == 'X')
 		{
 			data->game->moves++;
@@ -64,6 +70,29 @@ void	player_move(t_data *data, int a)
 		data->game->moves++;
 	}
 	print_map(data);
+}
+
+void	collect(t_data *data, int flag)
+{
+	printf("ENTERED COLLECT FUNCTION\n\n");
+	int i;
+
+	i = 0;
+	while (i < data->game->nb_collectibles)
+	{
+		if ((data->collectibles[i].x == data->game->pos_x+flag && data->collectibles[i].y == data->game->pos_y) || (data->collectibles[i].x == data->game->pos_x && data->collectibles[i].y == data->game->pos_y+flag))
+		{
+			*(data->collectibles[i].collected) = 1;
+			printf("123456789\ncol.x = %d\tcol.y = %d\tcol.collected = %d\n", data->collectibles[i].x, data->collectibles[i].y, *(data->collectibles[i].collected));
+			printf("pos x = %d\tpos y = %d\n\n", data->game->pos_x, data->game->pos_y+flag);
+			break ;
+		}
+		printf("col.x = %d\tcol.y = %d\tcol.collected = %d\n", data->collectibles[i].x, data->collectibles[i].y, *(data->collectibles[i].collected));
+		printf("pos x = %d\tpos y = %d\n\n", data->game->pos_x, data->game->pos_y+flag);
+		i++;
+	}
+	// for (int k = 0; k < data->game->nb_collectibles; k++)
+	// 	printf("collectible[%d] --- x = %d\ty = %d\tcollected = %d\n", k, data->collectibles[k].x, data->collectibles[k].y, *(data->collectibles[k].collected));
 }
 
 int		mvt_checker(t_data *data, int a)
@@ -115,16 +144,12 @@ int		is_mvt_possible(t_data *data, char *mvt)
 {
 	if (ft_strncmp(mvt, "up", 2) == 0)
 		return (mvt_checker(data, 1));
-		
 	else if (ft_strncmp(mvt, "down", 4) == 0)
 		return (mvt_checker(data, 2));
-		
 	else if (ft_strncmp(mvt, "left", 4) == 0)
 		return (mvt_checker(data, 3));
-		
 	else if (ft_strncmp(mvt, "right", 5) == 0)
 		return (mvt_checker(data, 4));
-		
 	else
 		return (0);
 }
@@ -133,13 +158,22 @@ void	mvt_ud(t_data *data, int keysym)
 {
 	if (keysym == 65362)
 	{
+		data->player_dir =
 		if(is_mvt_possible(data, "up"))
+		{
+			data->player_is_moving = 1;
 			player_move(data, 1);
+			data->player_is_moving = 0;
+		}
 	}
 	else
 	{
 		if (is_mvt_possible(data, "down"))
+		{
+			data->player_is_moving = 1;
 			player_move(data, 2);
+			data->player_is_moving = 0;
+		}
 	}
 }
 
@@ -148,12 +182,20 @@ void	mvt_lr(t_data *data, int keysym)
 	if (keysym == 65361)
 	{
 		if (is_mvt_possible(data, "left"))
+		{
+			data->player_is_moving = 1;
 			player_move(data, 3);
+			data->player_is_moving = 0;
+		}
 	}
 	else
 	{
 		if (is_mvt_possible(data, "right"))
+		{
+			data->player_is_moving = 1;
 			player_move(data, 4);
+			data->player_is_moving = 0;
+		}
 	}
 }
 
@@ -176,10 +218,10 @@ void	initialize_map(t_data *data)
 				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->wall_text[0], x * TILE_SIZE, y * TILE_SIZE);
 			if (data->game->map[y][x] == 'E')
 				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->exit_text[0], x * TILE_SIZE, y * TILE_SIZE);
-			if (data->game->map[y][x] == 'C')
-				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->collec_text[0], x * TILE_SIZE, y * TILE_SIZE);
-			if (data->game->map[y][x] == 'X')
-				mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->opps_text[0], x * TILE_SIZE, y * TILE_SIZE);
+			// if (data->game->map[y][x] == 'C')
+			// 	mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->collec_text[0], x * TILE_SIZE, y * TILE_SIZE);
+			// if (data->game->map[y][x] == 'X')
+			// 	mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->opps_text[0], x * TILE_SIZE, y * TILE_SIZE);
 			x++;
 		}
 		y++;
@@ -259,133 +301,95 @@ void    fill_game_struct(t_data *data, char **map)
 	data->window->height = data->game->rows * TILE_SIZE;
 }
 
-int	ft_init_player(t_data *data)
-{
-	int x;
-	int y;
-
-	x = 32;
-	y = 32;
-	data->player_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/player/coin_1.xpm", &x, &y);
-	if (data->player_text[0] == NULL)
-		return (ft_printf("[TEXTURE] - Failed to load player\n"), 0);
-	return (1);
-}
-
-int	ft_init_tiles(t_data *data)
-{
-	int x;
-	int y;
-
-	x = 32;
-	y = 32;
-	data->tile_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/tiles/tile_3.xpm", &x, &y);
-	if (data->tile_text[0] == NULL)
-		return (ft_printf("[TEXTURE] - Failed to load tiles\n"), 0);
-	return (1);
-}
-
-int	ft_init_walls(t_data *data)
-{
-	int x;
-	int y;
-
-	x = 32;
-	y = 32;
-	data->wall_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/wall/wall_2.xpm", &x, &y);
-	if (data->wall_text[0] == NULL)
-		return (ft_printf("[TEXTURE] - Failed to load walls\n"), 0);
-	return (1);
-}
-
-int	ft_init_exit(t_data *data)
+void anim_opps(t_data *data, int frame)
 {
 	int i;
-	int x;
-	int y;
-	char *buf;
-	char *file;
 
 	i = 0;
-	x = 32;
-	y = 32;
-	while (i < 5)
+	while (i < data->game->nb_x)
 	{
-		buf = ft_strjoin("assets/exit/exit_", ft_itoa(i+1));
-		file = ft_strjoin(buf, ".xpm");
-		data->exit_text[i] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/exit/exit_2.xpm", &x, &y);
-		if (data->exit_text[i] == NULL)
-			return (ft_printf("[TEXTURE] - Failed to load exit\n"), 0);
+		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->opps_text[frame], data->enemies[i].x * TILE_SIZE, data->enemies[i].y * TILE_SIZE);
 		i++;
 	}
-	return (1);
 }
-
-int	ft_init_collectibles(t_data *data)
+void	anim_exit(t_data *data, int frame)
 {
-	int x;
-	int y;
-	
-	x = 32;
-	y = 32;
-	data->collec_text[0] = mlx_xpm_file_to_image(data->mlx_ptr, "assets/collectible/col_1.xpm", &x, &y);
-	if (data->collec_text[0] == NULL)
-		return (ft_printf("[TEXTURE] - Failed to load collectibles\n"), 0);
-	return (1);
+	if (data->game->collected == data->game->nb_collectibles)
+		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->exit_text[frame], data->game->exit_x * TILE_SIZE, data->game->exit_y * TILE_SIZE);
 }
 
-int	ft_init_opps(t_data *data)
+void	anim_collectibles(t_data *data, int frame)
 {
 	int i;
-	int x;
-	int y;
-	char *buf;
-	char *file;
-	
+
 	i = 0;
-	x = 32;
-	y = 32;
-	while (i < 4)
+	while (i < data->game->nb_collectibles)
 	{
-		buf = ft_strjoin("assets/opps/op1/op1_", ft_itoa(i+1));
-		file = ft_strjoin(buf, ".xpm");
-		data->opps_text[i] = mlx_xpm_file_to_image(data->mlx_ptr, file, &x, &y);
-		if (data->opps_text[i] == NULL)
-			return (ft_printf("[TEX	data->enemies = (t_enemies *)malloc()TURE] - Failed to load opps (%d)\n", i+1), 0);
+		// printf("data->collectibles[%d] = %d\n", i, *(data->collectibles[i].collected));
+		if (*(data->collectibles[i].collected) == 0)
+			mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->collec_text[frame], data->collectibles[i].x * TILE_SIZE, data->collectibles[i].y * TILE_SIZE);
 		i++;
-	}
-	return (1);
+	}	
 }
 
-int ft_load_textures(t_data *data)
+void	anim_player(t_data *data, int frame)
 {
-	if(!(ft_init_player(data)))
-		return (0);
-	if (!(ft_init_tiles(data)))
-		return (0);
-	if (!(ft_init_walls(data)))
-		return (0);
-	if (!(ft_init_exit(data)))
-		return (0);
-	if (!(ft_init_collectibles(data)))
-		return (0);
-	if (!(ft_init_opps(data)))
-		return (0);
-	return (1);
+	
 }
 
 int	animation_update(void *param)
 {
-	int i;
+	int opps_frame;
+	int exit_frame;
+	int col_frame;
+	int player_frame;
 
-	i = 0;
 	t_data *data = (t_data *)param;
-	data->anim_counter++;
-	int current_frame = (data->anim_counter / 2) % 4;
-	while (i < data->game->nb_x)
-	{
-		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->opps_text[current_frame], data->enemies[i].x * TILE_SIZE, data->enemies[i].y * TILE_SIZE);
-		i++;
-	}
+	opps_frame = (data->anim_counter[0]++ / 2000) % 4;
+	exit_frame = (data->anim_counter[1]++ / 4000) % 4 + 1;
+	col_frame = (data->anim_counter[2]++ / 2000) % 4;
+	player_frame = (data->anim_counter[3]++ / 500) % 8;
+	anim_opps(data, opps_frame);
+	anim_exit(data, exit_frame);
+	anim_collectibles(data, col_frame);
+	anim_player(data, player_frame);
+	// mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->player_text[0], data->game->pos_x * TILE_SIZE, data->game->pos_y * TILE_SIZE);
 	return (0);
 }
+
+// int	animation_update(void *param)
+// {
+// 	int i;
+
+// 	i = 0;
+// 	t_data *data = (t_data *)param;
+// 	data->anim_counter[0]++;
+// 	int current_frame = (data->anim_counter[0] / 2) % 4;
+// 	while (i < data->game->nb_x)
+// 	{
+// 		mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->opps_text[current_frame], data->enemies[i].x * TILE_SIZE, data->enemies[i].y * TILE_SIZE);
+// 		i++;
+// 	}
+// 	return (0);
+// }
+
+
+/*
+int event_loop(void *param)
+{
+    t_data *data = (t_data *)param;
+
+    // Update game state
+    update_collectibles(data);
+    update_enemies(data);
+
+    // Render game state
+    collectibles(data);
+    enemies(data);
+
+    return (0);
+}
+
+mlx_loop_hook(data.mlx_ptr, event_loop, &data);
+
+FIX THE BUG OF RACE CONDITION*/

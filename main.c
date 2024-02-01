@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 16:39:41 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/29 18:18:48 by mbest            ###   ########.fr       */
+/*   Updated: 2024/01/31 13:50:36 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ int	main(void)
 	if (!(ber_extension(MAP_FILE)))
 		return (ft_printf("Invalid map. Must have a .ber extension.\n"), 1);
 	fill_data_struct(&data);
+		printf("OKOKOK1\n");
 	map = read_map(&data);
     if (map == NULL)
 		return (1);

@@ -2,8 +2,9 @@ SO_LONG = main.c \
 			get_next_line.c \
 			get_next_line_utils.c \
 			check_map.c \
+			textures_1.c \
+			textures_2.c \
 			utils.c \
-			utils_2.c \
 			game.c
 
 LIBFT = libft/libft.a

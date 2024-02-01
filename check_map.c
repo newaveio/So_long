@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 16:09:08 by mbest             #+#    #+#             */
-/*   Updated: 2024/01/30 22:34:35 by mbest            ###   ########.fr       */
+/*   Updated: 2024/02/01 16:52:44 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,14 @@ int	check_caracters(char **map, t_data *data)
 		{
 			if (map[i][j] == '0' || map[i][j] == '1' || map[i][j] == 'C'
 				|| map[i][j] == 'E' || map[i][j] == 'P' || map[i][j] == 'X')
+				{
+					if (map[i][j] == 'E')
+					{
+						data->game->exit_x = j;
+						data->game->exit_y = i;
+					}
 				j++;
+				}
 			else
 				return (0); // Error occured
 		}
@@ -139,13 +146,48 @@ void	fill_enemies(char **map, t_data *data)
 		}
 		i++;
 	}
-	index = 0;
-	while (index < data->game->nb_x)
+	// index = 0;
+	// while (index < data->game->nb_x)
+	// {
+	// 	printf("enemie[%d].x = %d\n", index, data->enemies[index].x);
+	// 	printf("enemie[%d].y = %d\n", index, data->enemies[index].y);
+	// 	index++;
+	// }
+}
+
+void	fill_mapping_collectibles(char **map, t_data *data)
+{
+	int i;
+	int j;
+	int index;
+
+	i = -1;
+	index = -1;
+	data->collectibles = (t_col *)malloc(data->game->nb_collectibles * sizeof(t_col));
+	if (data->collectibles == NULL)
+		return ;
+	while (++i < data->game->rows)
 	{
-		printf("enemie[%d].x = %d\n", index, data->enemies[index].x);
-		printf("enemie[%d].y = %d\n", index, data->enemies[index].y);
-		index++;
+		j = -1;
+		while (map[i][++j])
+		{
+			if (map[i][j] == 'C')
+			{
+				data->collectibles[++index].x = j;
+				data->collectibles[index].y = i;
+				data->collectibles[index].collected = (int *)malloc(sizeof(int));
+				if (data->collectibles[index].collected == NULL)
+					return ;
+				*(data->collectibles[index].collected) = 0;
+			}
+		}
 	}
+	// index = 0;
+	// while (index < data->game->nb_collectibles)
+	// {
+	// 	printf("collectible[%d] ---- x = %d\ty = %d\t collected = %d\n\n", index, data->collectibles[index].x, data->collectibles[index].y, *(data->collectibles[index].collected));
+	// 	index++;
+	// }
 }
 
 int	get_map_info(char **map, t_data *data)
@@ -157,6 +199,7 @@ int	get_map_info(char **map, t_data *data)
 	j = 0;
 	get_c_e_p(map, data);
 	fill_enemies(map, data);
+	fill_mapping_collectibles(map, data);
 	if (!(check_map_info(data)))
 		return (0);
 	return (1);
