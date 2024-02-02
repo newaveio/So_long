@@ -6,31 +6,50 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/31 11:08:07 by mbest             #+#    #+#             */
-/*   Updated: 2024/02/01 21:51:54 by mbest            ###   ########.fr       */
+/*   Updated: 2024/02/02 17:51:25 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_init_opps(t_data *data)
+char *ft_init_player_bis(t_data *data)
 {
-	int i;
+	char *buf1;
+	char *buf2;
+	char *buf_itoa;
+	char *file;
+
+	buf_itoa = ft_itoa(data->misc1 + 1);
+	buf1 = ft_strjoin("assets/player/mvt", buf_itoa);
+	free(buf_itoa);
+	buf2 = ft_strjoin(buf1, "/");
+	free(buf1);
+	buf_itoa = ft_itoa(data->misc2 + 1);
+	buf1 = ft_strjoin(buf_itoa, ".xpm");
+	file = ft_strjoin(buf2, buf1);
+	return (free(buf1), free(buf2), free(buf_itoa), file);
+}
+
+int	ft_init_player(t_data *data)
+{
 	int x;
 	int y;
-	char *buf;
 	char *file;
-	
-	i = 0;
+
+	data->misc1 = -1;
 	x = TILE_SIZE;
 	y = TILE_SIZE;
-	while (i < 4)
+	while (++data->misc1 < 4)
 	{
-		buf = ft_strjoin("assets/opps/op2/op_", ft_itoa(i+1));
-		file = ft_strjoin(buf, ".xpm");
-		data->opps_text[i] = mlx_xpm_file_to_image(data->mlx_ptr, file, &x, &y);
-		if (data->opps_text[i] == NULL)
-			return (ft_printf("[TEX	data->enemies = (t_enemies *)malloc()TURE] - Failed to load opps (%d)\n", i+1), 0);
-		i++;
+		data->misc2 = -1;
+		while (++data->misc2 < 8)
+		{
+			file = ft_init_player_bis(data);
+			data->player_text[data->misc1][data->misc2] = mlx_xpm_file_to_image(data->mlx_ptr, file, &x, &y);
+			if (data->player_text[data->misc1][data->misc2] == NULL)
+				return (ft_printf("[TEXTURE] - Failed to load player[%d][%d]\n", data->misc1, data->misc2), 0);
+			free(file);
+		}
 	}
 	return (1);
 }

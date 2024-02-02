@@ -16,7 +16,6 @@
 #  define BUFFER_SIZE 5
 # endif
 
-# define MAP_FILE "maps/map_5.ber"
 # define TILE_SIZE 32
 # define EXTRA_HEIGHT 100
 # define TRANSPARENT_COLOR 0x000000
@@ -73,6 +72,7 @@ typedef struct s_col
 
 typedef struct s_data
 {
+	char				**buf_map;
 	int					misc1;
 	int					misc2;
 	int					player_is_moving;
@@ -118,38 +118,39 @@ int						found_newline(t_list_gnl *stash);
 
 // UTILS.C
 int						ft_strlen_nl(char *str);
-int						ft_count_map_lines(t_data *data);
-char					**fill_map(int rows);
-char					**read_map(t_data *data);
+int						ft_count_map_lines(t_data *data, const char *filename);
+int						fill_map(t_data *data, const char *filename);
+int						read_map(t_data *data);
 int						ber_extension(const char *filename);
+int						check_map(t_data *data, const char *filename);
 
 // TEXTURES_1.C
-int						ft_init_player(t_data *data);
 int						ft_init_tiles(t_data *data);
 int						ft_init_walls(t_data *data);
+int						ft_init_opps(t_data *data);
 int						ft_init_exit(t_data *data);
 int						ft_init_collectibles(t_data *data);
 
 // TEXTURES_2.C
-int						ft_init_opps(t_data *data);
+char					*ft_init_player_bis(t_data *data);
+int						ft_init_player(t_data *data);
 int						ft_load_textures(t_data *data);
 
-
 // CHECK_MAP.C
-int						surrounded_by_walls(char **map, t_data *data);
-int						is_rectangular(char **map, t_data *data);
-int						check_caracters(char **map, t_data *data);
+int						surrounded_by_walls(t_data *data);
+int						is_rectangular(t_data *data);
+int						check_caracters(t_data *data);
 int						check_map_info(t_data *data);
-void					get_c_e_p(char **map, t_data *data);
-int						get_map_info(char **map, t_data *data);
-void					fill_struct_player_map(char **map, t_data *data);
-int						flood_fill(char **map, int x, int y, t_data *data);
+void					get_c_e_p(t_data *data);
+int						mapping_enemies(t_data *data);
+int						mapping_collectibles_bis(t_data *data, int index);
+int						mapping_collectibles(t_data *data);
+int						get_map_info(t_data *data);
+void					fill_struct_player_map(t_data *data);
 int						flood_fill_c(char **map, int x, int y, t_data *data);
 int						flood_fill_e(char **map, int x, int y, t_data *data);
-void					fill_enemies(char **map, t_data *data);
-void					fill_mapping_collectibles(char **map, t_data *data);
-char					**copy_map(char **map, int rows);
-int						is_map_valid(char **map, t_data *data);
+char					**copy_map(t_data *data);
+int						is_map_valid(t_data *data);
 
 // GAME.C
 void					player_move(t_data *data, int a);
@@ -163,8 +164,8 @@ void					mvt_lr(t_data *data, int keysym);
 int						on_keypress(int keysym, t_data *data);
 int						on_destroy(t_data *data);
 
-void					fill_game_struct(t_data *data, char **map);
-void					fill_data_struct(t_data *data);
+void					fill_game_struct(t_data *data);
+int						fill_data_struct(t_data *data);
 
 void					draw_moves(t_data *data);
 void					ft_update_map(t_data *data, int old_x, int old_y);

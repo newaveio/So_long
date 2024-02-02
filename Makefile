@@ -50,6 +50,10 @@ $(NAME): $(OBJS)
 $(MLX_LIB):
 	@make -C $(MLX_DIR)
 
+l: $(NAME)
+	./map_gen.pl
+	./$(NAME) rand_map.ber
+
 clean:
 	rm -f $(OBJS)
 	rm -rf $(OBJDIR)
