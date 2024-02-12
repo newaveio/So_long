@@ -1,11 +1,18 @@
-SO_LONG = main.c \
-			get_next_line.c \
-			get_next_line_utils.c \
-			check_map.c \
-			textures_1.c \
-			textures_2.c \
-			utils.c \
-			game.c
+SO_LONG = src/animation_1.c \
+			src/animation_2.c \
+			src/animation_3.c \
+			src/check_map_1.c \
+			src/check_map_2.c \
+			src/check_map_3.c \
+			src/check_map_4.c \
+			src/clean_function.c \
+			src/main.c \
+			src/movement_1.c \
+			src/movement_2.c \
+			src/support.c \
+			src/textures_1.c \
+			src/textures_2.c \
+			src/utils.c \
 
 LIBFT = libft/libft.a
 
@@ -13,7 +20,7 @@ LIBFTDIR = libft/
 
 SRC = $(SO_LONG)
 
-OBJS = $(addprefix $(OBJDIR),${SRC:.c=.o})
+OBJS = $(addprefix $(OBJDIR), $(notdir ${SRC:.c=.o}))
 
 OBJDIR = objs/
 
@@ -39,7 +46,7 @@ endif
 
 all: $(MLX_LIB) $(NAME)
 
-$(OBJDIR)%.o : %.c
+$(OBJDIR)%.o : src/%.c
 	mkdir -p $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES)
 
@@ -51,7 +58,7 @@ $(MLX_LIB):
 	@make -C $(MLX_DIR)
 
 l: $(NAME)
-	./map_gen.pl
+	./map_gen.pl \
 	./$(NAME) rand_map.ber
 
 clean:
@@ -61,6 +68,7 @@ clean:
 
 fclean: clean
 	rm -f $(NAME)
+	rm -f rand_map.ber
 	rm -f $(LIBFT)
 
 re: fclean \

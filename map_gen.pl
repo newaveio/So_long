@@ -8,8 +8,8 @@ my $wall_density = 0.2;
 my $collectible_density = 0.1;
 
 # Define the size of the map
-my $rows = 3 + int(rand(18));
-my $cols = 3 + int(rand(18));
+my $rows = 3 + int(rand(8));
+my $cols = 3 + int(rand(8));
 
 # Create an empty 2D array
 my @map;
