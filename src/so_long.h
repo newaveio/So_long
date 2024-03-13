@@ -79,8 +79,8 @@ typedef struct s_data
 	// int					img_to_win;
 	int				anim_counter[4];
 	void			*player_text[4][8];
-	void			*tile_text[2];
-	void			*wall_text[2];
+	void			*tile_text[1];
+	void			*wall_text[1];
 	void			*exit_text[5];
 	void			*collec_text[4];
 	void			*opps_text[4];
@@ -147,5 +147,12 @@ int					ft_load_textures(t_data *data);
 int					ft_strlen_nl(char *str);
 int					ft_count_map_lines(t_data *data, const char *filename);
 void				print_map(t_data *data);
+void				free_textures(t_data *data);
+void				free_player_text(t_data *data);
+void				free_tile_text(t_data *data);
+void				free_wall_text(t_data *data);
+void				free_exit_text(t_data *data);
+void				free_col_text(t_data *data);
+void				free_opps_text(t_data *data);
 
 #endif

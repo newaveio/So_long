@@ -6,6 +6,8 @@ SO_LONG = src/animation_1.c \
 			src/check_map_3.c \
 			src/check_map_4.c \
 			src/clean_function.c \
+			src/free_text_1.c \
+			src/free_text_2.c \
 			src/main.c \
 			src/movement_1.c \
 			src/movement_2.c \

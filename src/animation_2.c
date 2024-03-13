@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 22:39:40 by mbest             #+#    #+#             */
-/*   Updated: 2024/03/13 15:23:02 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/13 16:23:36 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,11 @@ void	collect(t_data *data, int flag)
 
 int	on_destroy(t_data *data)
 {
+	free_textures(data);
 	mlx_destroy_window(data->mlx_ptr, data->win_ptr);
 	mlx_destroy_display(data->mlx_ptr);
 	free(data->mlx_ptr);
+	free_if(data);
 	exit(0);
 	return (0);
 }

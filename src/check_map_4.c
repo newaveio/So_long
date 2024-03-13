@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 22:55:10 by mbest             #+#    #+#             */
-/*   Updated: 2024/02/12 23:28:54 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/13 15:33:43 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ int check_map(t_data *data, const char *filename)
 		return (0);
 	fill_game_struct(data);
 	print_map(data);
+	init_anim_counter(data);
 	return (1);
 }
 
