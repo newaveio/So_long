@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/31 11:07:03 by mbest             #+#    #+#             */
-/*   Updated: 2024/02/12 23:18:24 by mbest            ###   ########.fr       */
+/*   Updated: 2024/02/19 10:42:04 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ int	ft_init_opps(t_data *data)
 		free(file);
 		file = ft_strjoin(buf, ".xpm");
 		data->opps_text[i] = mlx_xpm_file_to_image(data->mlx_ptr, file, &x, &y);
+		// mlx_get_data_addr(data->opps_text[i], &data->bpp, &data->size_line, &data->endian);
 		if (data->opps_text[i] == NULL)
 			return (ft_printf("[TEXTURES] - Failed to load opps [%d]\n", i+1), 0);
 		(free(buf), free(file));

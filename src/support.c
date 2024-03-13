@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 18:33:35 by mbest             #+#    #+#             */
-/*   Updated: 2024/02/12 23:29:34 by mbest            ###   ########.fr       */
+/*   Updated: 2024/02/19 09:53:22 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ void    fill_game_struct(t_data *data)
 	
 	i = 0;
 	j = 0;
-    data->game->collected = 0;
 	data->game->cols = ft_strlen_nl(data->game->map[0]);
     data->game->moves = 0;
 	data->window->width = data->game->cols * TILE_SIZE;
