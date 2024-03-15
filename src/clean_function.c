@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 22:51:27 by mbest             #+#    #+#             */
-/*   Updated: 2024/02/12 23:50:14 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/14 19:27:13 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,16 @@ void	free_if(t_data *data)
 	{
 		if (data->game->flood)
 			free(data->game->flood);
+		if (data->game->map)
+		{
+			i = 0;
+			while(i < data->game->rows)
+			{
+				free(data->game->map[i]);
+				i++;
+			}
+			free(data->game->map);
+		}
 		free(data->game);
 	}
 	if (data->window)

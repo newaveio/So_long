@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 16:39:41 by mbest             #+#    #+#             */
-/*   Updated: 2024/03/13 16:21:55 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/14 19:24:20 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	main(int argc, char **argv)
 		mlx_loop_hook(data.mlx_ptr, animation_update, &data);
 		mlx_loop(data.mlx_ptr);
 		// free_structure(&data);
-		free_if(&data);
+		// free_if(&data);
 	}
 	else
 		return(ft_printf("Error\n"), 0);

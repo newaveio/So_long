@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 15:46:01 by mbest             #+#    #+#             */
-/*   Updated: 2024/03/13 16:10:15 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/15 11:37:50 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ void	free_player_text(t_data *data)
 	int	j;
 
 	i = 0;
-	j = 0;
 	while (i < 4)
 	{
+        j = 0;
 		while (j < 8)
 		{
 			if (data->player_text[i][j] != NULL)
@@ -63,7 +63,7 @@ void    free_exit_text(t_data *data)
 {
     int i;
 
-    i = 4;
+    i = 0;
     while (i < 5)
     {
         if (data->exit_text[i] != NULL)
