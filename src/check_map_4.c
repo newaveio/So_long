@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 22:55:10 by mbest             #+#    #+#             */
-/*   Updated: 2024/03/13 15:33:43 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/15 13:26:53 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,23 @@ int	ber_extension(const char *filename)
 	return (0);
 }
 
+int	init_ptr(t_data *data)
+{
+	data->buf_map = NULL;
+	data->collectibles = NULL;
+	data->enemies = NULL;
+	data->window = NULL;
+	data->game = (t_game *)ft_calloc(1, sizeof(t_game));
+	if (data->game == NULL)
+		return (ft_printf("[data->game] - Failled to allocate memory\n"), 0);
+	data->game->flood = NULL;
+	return (1);
+}
+
 int check_map(t_data *data, const char *filename)
 {
+	if (!init_ptr(data))
+		return (ft_printf("Malloc error\n"), 0);
 	if (!(ber_extension(filename)))
 		return (ft_printf("Must have a .ber extension.\n"), 0);
 	if (!(fill_data_struct(data)))

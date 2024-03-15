@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 22:33:03 by mbest             #+#    #+#             */
-/*   Updated: 2024/03/13 15:33:49 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/15 13:42:25 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@ int	animation_update(void *param)
 
 	data = (t_data *)param;
 	// init_anim_counter(data);
-	opps_frame = (data->anim_counter[0]++ / 5000) % 4;
-	exit_frame = (data->anim_counter[1]++ / 4000) % 4 + 1;
-	col_frame = (data->anim_counter[2]++ / 3000) % 4;
+	opps_frame = (data->anim_counter[0]++ / 8000) % 4;
+	exit_frame = (data->anim_counter[1]++ / 8000) % 4 + 1;
+	col_frame = (data->anim_counter[2]++ / 8000) % 4;
 	anim_opps(data, opps_frame);
 	anim_exit(data, exit_frame);
 	anim_collectibles(data, col_frame);

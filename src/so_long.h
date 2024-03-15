@@ -121,6 +121,7 @@ int					is_map_valid(t_data *data);
 int					flood_fill_c(char **map, int x, int y, t_data *data);
 int					flood_fill_e(char **map, int x, int y, t_data *data);
 int					ber_extension(const char *filename);
+int					init_ptr(t_data *data);
 int					check_map(t_data *data, const char *filename);
 int					fill_map(t_data *data, const char *filename);
 int					read_map(t_data *data);
@@ -154,5 +155,6 @@ void				free_wall_text(t_data *data);
 void				free_exit_text(t_data *data);
 void				free_col_text(t_data *data);
 void				free_opps_text(t_data *data);
+void				free_invalid_map(t_data *data);
 
 #endif

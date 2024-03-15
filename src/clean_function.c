@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 22:51:27 by mbest             #+#    #+#             */
-/*   Updated: 2024/03/14 19:27:13 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/15 13:12:11 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,4 +83,46 @@ void	free_if(t_data *data)
 	}
 	if (data->window)
 		free(data->window);
+}
+
+void	free_invalid_map(t_data *data)
+{
+	int i;
+	
+	i = 0;
+	if (data->buf_map)
+	{
+		while (i < data->game->rows)
+		{
+			free(data->buf_map[i]);
+			i++;
+		}
+		free(data->buf_map);
+	}
+	i = 0;
+	if (data->collectibles)
+	{
+		while (i < data->game->nb_collectibles)
+		{
+			free(data->collectibles[i].collected);
+			i++;
+		}
+		free(data->collectibles);
+	}
+	if (data->enemies)
+	{
+		free(data->enemies);
+	}
+	if (data->window)
+	{
+		free(data->window);
+	}
+	if (data->game)
+	{
+		if (data->game->flood)
+		{
+			free(data->game->flood);
+		}
+		free(data->game);
+	}
 }

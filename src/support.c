@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/23 18:33:35 by mbest             #+#    #+#             */
-/*   Updated: 2024/02/19 09:53:22 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/15 13:26:45 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 int	fill_data_struct(t_data *data)
 {
-	data->game = (t_game *)ft_calloc(1, sizeof(t_game));
-	if (data->game == NULL)
-		return (ft_printf("[data->game] - Failled to allocate memory\n"), 0);
+	// data->game = (t_game *)ft_calloc(1, sizeof(t_game));
+	// if (data->game == NULL)
+	// 	return (ft_printf("[data->game] - Failled to allocate memory\n"), 0);
 	data->game->flood = (t_flood *)ft_calloc(1, sizeof(t_flood));
 	if (data->game->flood == NULL)
 		return (ft_printf("[data->game->flood] - Failled to allocate memory\n"), 0);

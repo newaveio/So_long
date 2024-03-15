@@ -6,7 +6,7 @@
 /*   By: mbest <mbest@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 22:50:18 by mbest             #+#    #+#             */
-/*   Updated: 2024/03/14 19:22:31 by mbest            ###   ########.fr       */
+/*   Updated: 2024/03/15 13:11:14 by mbest            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int	is_map_valid(t_data *data)
 	if (!(flood_fill_c(buffer_map_c, data->game->flood->x, data->game->flood->y,
 				data)) || !(flood_fill_e(buffer_map_e, data->game->flood->x,
 				data->game->flood->y, data)))
-		return (ft_printf("Flood Fill Failed\n"), 0);
+		return (free_2d_array(buffer_map_c, data->game->rows), free_2d_array(buffer_map_e, data->game->rows), ft_printf("Flood Fill Failed\n"), 0);
 	if (!(copy_map_bis(data)))
 		return (ft_printf("Failed to copy buf_map to data->game->map\n"), free_2d_array(buffer_map_c, data->game->rows), free_2d_array(buffer_map_e, data->game->rows), 0);
 	return (free_2d_array(buffer_map_c, data->game->rows), free_2d_array(buffer_map_e, data->game->rows), 1);
